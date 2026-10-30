@@ -1,12 +1,12 @@
 import type { ContextKind } from "../types";
 import { chars, times, type SnippetDef } from "./helpers";
 
-const load = (id: string, zh: [string, string], en: [string, string], css: string, html: SnippetDef["html"], m: ContextKind[] = ["feedback"], tech?: SnippetDef["tech"]): SnippetDef =>
+export const load = (id: string, zh: [string, string], en: [string, string], css: string, html: SnippetDef["html"], m: ContextKind[] = ["feedback"], tech?: SnippetDef["tech"]): SnippetDef =>
   ({ id, zh, en, c: "loader", t: "auto", m, css, html, tech });
 
-const box = (inner = "") => (_t: string, l: string) => `<div class="$" role="status" aria-label="${l === "zh" ? "加载中" : "Loading"}">${inner}</div>`;
-const n = (count: number, tag = "i") => box(times(count, () => `<${tag}></${tag}>`));
-const spin = "@keyframes $-spin { to { transform: rotate(360deg); } }";
+export const box = (inner = "") => (_t: string, l: string) => `<div class="$" role="status" aria-label="${l === "zh" ? "加载中" : "Loading"}">${inner}</div>`;
+export const n = (count: number, tag = "i") => box(times(count, () => `<${tag}></${tag}>`));
+export const spin = "@keyframes $-spin { to { transform: rotate(360deg); } }";
 
 export const loaderSnippets: SnippetDef[] = [
   load("spinner-ring", ["圆环转圈", "最经典的加载圈：一段彩色圆弧不停旋转。"], ["Ring Spinner", "The classic loader: a colored arc spinning around a ring."],

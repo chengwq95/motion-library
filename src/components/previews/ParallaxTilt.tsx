@@ -1,8 +1,11 @@
 "use client";
 import { useRef } from "react";
+import { cardHint } from "@/lib/effects/cards";
+import { useI18n } from "@/lib/i18n";
 import type { PreviewProps } from "@/lib/types";
 
 export default function ParallaxTilt({ text }: PreviewProps) {
+  const { locale } = useI18n();
   const card = useRef<HTMLDivElement>(null);
   const glare = useRef<HTMLDivElement>(null);
 
@@ -22,9 +25,10 @@ export default function ParallaxTilt({ text }: PreviewProps) {
       card.current!.style.transform = "";
       glare.current!.style.opacity = "0";
     }}>
-    <div ref={card} className="relative grid h-[62%] max-w-[80%] aspect-[1.6] place-items-center rounded-2xl bg-linear-to-br from-indigo-500 via-violet-500 to-fuchsia-500 shadow-2xl shadow-indigo-500/30" style={{ transformStyle: "preserve-3d" }}>
-      <span className="px-4 text-center font-black text-white" style={{ fontSize: "7cqw", transform: "translateZ(40px)" }}>{text}</span>
-      <div ref={glare} className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300" />
+    <div ref={card} className="relative flex h-[64%] w-[58%] flex-col justify-end gap-1 rounded-[18px] bg-linear-to-br from-indigo-500 via-violet-500 to-fuchsia-500 p-[18px] text-white shadow-2xl shadow-indigo-500/30" style={{ transformStyle: "preserve-3d" }}>
+      <b className="text-[18px]" style={{ transform: "translateZ(40px)" }}>{text}</b>
+      <span className="text-xs text-white/80" style={{ transform: "translateZ(24px)" }}>{cardHint("hover", locale)}</span>
+      <div ref={glare} className="pointer-events-none absolute inset-0 rounded-[18px] opacity-0 transition-opacity duration-300" />
     </div>
   </div>;
 }

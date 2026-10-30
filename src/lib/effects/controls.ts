@@ -1,15 +1,15 @@
 import type { ContextKind, TriggerKind } from "../types";
 import { esc, times, w, type SnippetDef } from "./helpers";
 
-const ctl = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], t: TriggerKind, css: string, html: SnippetDef["html"]): SnippetDef =>
+export const ctl = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], t: TriggerKind, css: string, html: SnippetDef["html"]): SnippetDef =>
   ({ id, zh, en, c: "control", t, m, css, html });
 
-const on = (sel = "") => `.$:has(input:checked)${sel ? ` ${sel}` : ""}`;
-const switchHtml = (_t: string, l: string) => `<label class="$" aria-label="${l === "zh" ? "开关" : "Toggle"}"><input type="checkbox" hidden><i></i></label>`;
-const switchBase = `.$ { position: relative; width: 72px; height: 40px; border-radius: 40px; background: var(--line); cursor: pointer; transition: background .3s; }
+export const on = (sel = "") => `.$:has(input:checked)${sel ? ` ${sel}` : ""}`;
+export const switchHtml = (_t: string, l: string) => `<label class="$" aria-label="${l === "zh" ? "开关" : "Toggle"}"><input type="checkbox" hidden><i></i></label>`;
+export const switchBase = `.$ { position: relative; width: 72px; height: 40px; border-radius: 40px; background: var(--line); cursor: pointer; transition: background .3s; }
 .$ i { position: absolute; top: 4px; left: 4px; width: 32px; height: 32px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgb(0 0 0 / .25); transition: transform .35s cubic-bezier(.34,1.4,.64,1), width .35s; }`;
 
-const inputBase = `.$ { position: relative; width: 78%; }
+export const inputBase = `.$ { position: relative; width: 78%; }
 .$ input { width: 100%; box-sizing: border-box; padding: 18px 14px 8px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); color: var(--fg); font: inherit; font-size: 15px; outline: none; transition: border-color .3s, box-shadow .3s; }`;
 
 const SAMPLES: Record<string, { zh: string; en: string }> = {

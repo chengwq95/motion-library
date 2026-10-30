@@ -1,13 +1,13 @@
 import type { ContextKind, Locale, TriggerKind } from "../types";
 import { esc, times, w, type SnippetDef } from "./helpers";
 
-const icon = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], t: TriggerKind, css: string, html: (l: Locale) => string, tech?: SnippetDef["tech"]): SnippetDef =>
+export const icon = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], t: TriggerKind, css: string, html: (l: Locale) => string, tech?: SnippetDef["tech"]): SnippetDef =>
   ({ id, zh, en, c: "icon", t, m, css, html: (_t, l) => html(l), tech });
 
-const glyph = (g: string, label: string) => `<div class="$" role="img" aria-label="${esc(label)}">${g}</div>`;
-const sized = "font-size: 56px; line-height: 1;";
-const svg = (paths: string, view = "0 0 48 48") => `<svg class="$" viewBox="${view}" aria-hidden="true">${paths}</svg>`;
-const stroke = "fill: none; stroke: var(--fg); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;";
+export const glyph = (g: string, label: string) => `<div class="$" role="img" aria-label="${esc(label)}">${g}</div>`;
+export const sized = "font-size: 56px; line-height: 1;";
+export const svg = (paths: string, view = "0 0 48 48") => `<svg class="$" viewBox="${view}" aria-hidden="true">${paths}</svg>`;
+export const stroke = "fill: none; stroke: var(--fg); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;";
 
 export const iconSnippets: SnippetDef[] = [
   icon("icon-heartbeat", ["跳动爱心", "爱心像心跳一样连续跳动两下。"], ["Beating Heart", "A heart beats twice like a heartbeat."], ["feedback"], "auto",

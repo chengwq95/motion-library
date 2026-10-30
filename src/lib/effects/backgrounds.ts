@@ -2,7 +2,7 @@ import type { ContextKind, TriggerKind } from "../types";
 import { esc, rnd, times, type SnippetDef } from "./helpers";
 
 // Backgrounds fill the whole stage and show the sample text on top.
-const bg = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], css: string, layers: (t: string) => string, o: { t?: TriggerKind; dark?: boolean } = {}): SnippetDef => ({
+export const bg = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], css: string, layers: (t: string) => string, o: { t?: TriggerKind; dark?: boolean } = {}): SnippetDef => ({
   id, zh, en, c: "background", t: o.t ?? "auto", m,
   css: `.$ { position: absolute; inset: 0; overflow: hidden; display: grid; place-items: center; ${o.dark ? "background: #0b1020; color: #fff;" : "color: var(--fg);"} }
 .$ .t { position: relative; z-index: 2; margin: 0; font-size: 9cqw; font-weight: 900; text-align: center; }
@@ -10,7 +10,7 @@ ${css}`,
   html: (t) => `<div class="$">${layers(t)}<p class="t">${esc(t)}</p></div>`,
 });
 
-const pct = (i: number, seed: number) => `${(rnd(i, seed) * 100).toFixed(1)}%`;
+export const pct = (i: number, seed: number) => `${(rnd(i, seed) * 100).toFixed(1)}%`;
 
 export const backgroundSnippets: SnippetDef[] = [
   bg("bg-gradient-shift", ["渐变背景", "柔和的多色渐变缓慢移动。"], ["Shifting Gradient", "A soft multicolor gradient drifts slowly."], ["elegant"],

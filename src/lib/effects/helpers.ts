@@ -26,13 +26,13 @@ export const esc = (s: string) => s.replace(/[&<>"'$]/g, (c) => ESCAPES[c]);
 /** Picks the word for the current language. */
 export const w = (l: Locale, zh: string, en: string) => (l === "zh" ? zh : en);
 
-/** One span per character with stagger variables: --i index, --r reversed, --d distance from center, --s shuffled, --p parity. */
+/** One span per character with stagger variables: --i index, --r reversed, --d distance from center, --o signed offset from center, --s shuffled, --p parity. */
 export function chars(text: string, cls = "c") {
   const list = Array.from(text);
   const n = list.length;
   return list
     .map((ch, i) => {
-      const vars = `--i:${i};--r:${n - 1 - i};--d:${Math.abs(i - (n - 1) / 2)};--s:${(i * 7 + 3) % n};--p:${i % 2}`;
+      const vars = `--i:${i};--r:${n - 1 - i};--d:${Math.abs(i - (n - 1) / 2)};--o:${i - (n - 1) / 2};--s:${(i * 7 + 3) % n};--p:${i % 2}`;
       return `<span class="${cls}" style="${vars}">${ch === " " ? "&nbsp;" : esc(ch)}</span>`;
     })
     .join("");

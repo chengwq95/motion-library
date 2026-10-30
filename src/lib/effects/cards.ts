@@ -1,27 +1,42 @@
-import type { ContextKind, TriggerKind } from "../types";
+import type { ContextKind, Locale, TriggerKind } from "../types";
 import { esc, times, w, type SnippetDef } from "./helpers";
 
-const card = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], t: TriggerKind, css: string, html?: SnippetDef["html"]): SnippetDef => ({
-  id, zh, en, c: "card", t, m, css,
-  html: html ?? ((text, l) => `<div class="$"><b>${esc(text)}</b><span>${w(l, "把鼠标移上来看看", "Hover to see it move")}</span></div>`),
+// Every card preview uses the same card size (--card-w / --card-h) and the same title + hint layout.
+const SIZE = ".$, .$-w { --card-w: 58%; --card-h: 64%; }";
+export const CARD_HINTS: Record<TriggerKind, [string, string]> = {
+  hover: ["把鼠标移上来看看", "Hover to see it move"],
+  click: ["点一下试试", "Click to try it"],
+  auto: ["自动播放中", "Playing on its own"],
+  enter: ["进场动画", "Entrance animation"],
+  scroll: ["滚动时出现", "Appears on scroll"],
+  drag: ["拖动试试", "Drag to try it"],
+  focus: ["点进来试试", "Focus to try it"],
+};
+export const cardHint = (t: TriggerKind, l: Locale) => w(l, ...CARD_HINTS[t]);
+
+export const card = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], t: TriggerKind, css: string, html?: SnippetDef["html"]): SnippetDef => ({
+  id, zh, en, c: "card", t, m, css: `${SIZE}\n${css}`,
+  html: html ?? ((text, l) => `<div class="$"><b>${esc(text)}</b><span>${cardHint(t, l)}</span></div>`),
 });
 
 // The default card body: a title and a hint line.
-const face = `.$ { position: relative; width: 62%; height: 64%; box-sizing: border-box; padding: 18px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); color: var(--fg); transition: transform .35s cubic-bezier(.34,1.3,.64,1), box-shadow .35s, border-color .35s; }
+export const face = `.$ { position: relative; width: var(--card-w); height: var(--card-h); box-sizing: border-box; padding: 18px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); color: var(--fg); transition: transform .35s cubic-bezier(.34,1.3,.64,1), box-shadow .35s, border-color .35s; }
 .$ b { font-size: 18px; } .$ span { font-size: 12px; color: var(--muted); }`;
 
 // Gradient "photo" used by image-style cards.
-const photo = "linear-gradient(135deg, #6366f1, #ec4899 55%, #f59e0b)";
+export const photo = "linear-gradient(135deg, #6366f1, #ec4899 55%, #f59e0b)";
 
 export const cardSnippets: SnippetDef[] = [
   card("card-flip", ["3D 翻转卡片", "悬停时卡片沿竖轴翻到背面。"], ["3D Flip Card", "The card flips over to its back on hover."], ["showcase"], "hover",
-    `.$ { width: 62%; height: 64%; perspective: 800px; }
+    `.$ { width: var(--card-w); height: var(--card-h); perspective: 800px; }
 .$ div { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.65,0,.35,1); }
 .$:hover div { transform: rotateY(180deg); }
-.$ p { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; border-radius: 18px; backface-visibility: hidden; font-weight: 800; font-size: 18px; }
+.$ p { position: absolute; inset: 0; margin: 0; padding: 18px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; border-radius: 18px; backface-visibility: hidden; }
+.$ b { font-size: 18px; } .$ span { font-size: 12px; color: var(--muted); }
+.$ p + p span { color: rgb(255 255 255 / .8); }
 .$ p:first-child { background: var(--card); border: 1px solid var(--line); }
 .$ p + p { background: ${photo}; color: #fff; transform: rotateY(180deg); }`,
-    (t, l) => `<div class="$"><div><p>${esc(t)}</p><p>${w(l, "背面", "Back side")}</p></div></div>`),
+    (t, l) => `<div class="$"><div><p><b>${esc(t)}</b><span>${cardHint("hover", l)}</span></p><p><b>${esc(t)}</b><span>${w(l, "这是背面", "This is the back")}</span></p></div></div>`),
   card("card-lift", ["悬浮卡片", "悬停时卡片上浮并投下更深的阴影。"], ["Lifting Card", "The card rises and casts a deeper shadow on hover."], ["elegant"], "hover",
     `${face}\n.$:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgb(0 0 0 / .18); }`),
   card("card-gradient-border", ["渐变边框卡片", "彩色渐变边框沿卡片四周不停旋转。"], ["Spinning Border Card", "A colorful gradient border spins around the card."], ["tech"], "auto",
@@ -33,7 +48,7 @@ export const cardSnippets: SnippetDef[] = [
   card("card-glow-border", ["发光描边", "悬停时卡片边框亮起，外围出现柔光。"], ["Glowing Edge", "The border lights up with a soft outer glow on hover."], ["tech"], "hover",
     `${face}\n.$:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 30px color-mix(in oklab, var(--accent) 45%, transparent); }`),
   card("card-zoom-image", ["图片放大", "悬停时卡片里的图片缓缓放大，标题上移。"], ["Image Zoom", "The image slowly zooms in and the caption lifts on hover."], ["showcase"], "hover",
-    `.$ { position: relative; width: 62%; height: 64%; border-radius: 18px; overflow: hidden; color: #fff; }
+    `.$ { position: relative; width: var(--card-w); height: var(--card-h); border-radius: 18px; overflow: hidden; color: #fff; }
 .$ i { position: absolute; inset: 0; background: ${photo}; transition: transform .8s cubic-bezier(.22,1,.36,1); }
 .$ i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgb(0 0 0 / .55)); }
 .$ b { position: absolute; left: 16px; bottom: 14px; font-size: 18px; transition: transform .4s; }
@@ -41,7 +56,7 @@ export const cardSnippets: SnippetDef[] = [
 .$:hover b { transform: translateY(-6px); }`,
     (t) => `<div class="$"><i></i><b>${esc(t)}</b></div>`),
   card("card-overlay", ["信息浮层", "悬停时详情浮层从底部滑上来。"], ["Slide-up Overlay", "A details panel slides up from the bottom on hover."], ["showcase"], "hover",
-    `.$ { position: relative; width: 62%; height: 64%; border-radius: 18px; overflow: hidden; background: ${photo}; }
+    `.$ { position: relative; width: var(--card-w); height: var(--card-h); border-radius: 18px; overflow: hidden; background: ${photo}; }
 .$ div { position: absolute; inset: auto 0 0; padding: 16px; background: var(--card); color: var(--fg); transform: translateY(calc(100% - 46px)); transition: transform .4s cubic-bezier(.22,1,.36,1); }
 .$ b { display: block; margin-bottom: 6px; } .$ span { font-size: 12px; color: var(--muted); }
 .$:hover div { transform: none; }`,
@@ -65,7 +80,7 @@ ${face}
 .$ svg { position: absolute; inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px); overflow: visible; }
 .$ rect { width: calc(100% - 2px); height: calc(100% - 2px); fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 1000; stroke-dashoffset: 1000; transition: stroke-dashoffset 1s ease; }
 .$:hover rect { stroke-dashoffset: 0; }`,
-    (t, l) => `<div class="$"><svg aria-hidden="true"><rect x="1" y="1" rx="18" pathLength="1000"/></svg><b>${esc(t)}</b><span>${w(l, "把鼠标移上来看看", "Hover to see it move")}</span></div>`),
+    (t, l) => `<div class="$"><svg aria-hidden="true"><rect x="1" y="1" rx="18" pathLength="1000"/></svg><b>${esc(t)}</b><span>${cardHint("hover", l)}</span></div>`),
   card("card-focus-group", ["聚焦卡片组", "悬停某张卡片时，其他卡片变暗缩小。"], ["Focus Group", "Hovering one card dims and shrinks the others."], ["interactive"], "hover",
     `.$ { display: flex; gap: 12px; }
 .$ i { width: 70px; height: 96px; border-radius: 14px; background: ${photo}; transition: transform .3s, opacity .3s, filter .3s; }
@@ -144,7 +159,7 @@ ${times(8, (i) => `.$ i:nth-child(${i + 1}) { animation-delay: ${(i % 4) * 0.08 
 @keyframes $-k { 50% { transform: translateY(-4px); } }`,
     () => `<div class="$">${times(3, () => "<i></i>")}</div>`),
   card("card-profile", ["个人名片", "悬停时头像放大，社交图标依次弹出。"], ["Profile Card", "The avatar grows and social icons pop out in turn on hover."], ["interactive"], "hover",
-    `.$ { width: 62%; padding: 16px; box-sizing: border-box; display: grid; justify-items: center; gap: 8px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
+    `.$ { width: var(--card-w); height: var(--card-h); padding: 16px; box-sizing: border-box; display: grid; align-content: center; justify-items: center; gap: 8px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
 .$ i { width: 54px; height: 54px; border-radius: 50%; background: ${photo}; transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
 .$ p { display: flex; gap: 8px; margin: 0; }
 .$ p span { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in oklab, var(--fg) 8%, transparent); font-size: 12px; transform: scale(0); transition: transform .3s cubic-bezier(.34,1.56,.64,1); }

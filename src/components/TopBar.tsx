@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Monitor, Moon, Plus, Sun } from "lucide-react";
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { setLocale, setThemePref, useThemePref, type ThemePref } from "@/lib/prefs";
 import type { Locale } from "@/lib/types";
-import SubmitDialog from "@/components/SubmitDialog";
 
 const NEXT_THEME: Record<ThemePref, ThemePref> = { system: "light", light: "dark", dark: "system" };
 const THEME_ICON = { system: Monitor, light: Sun, dark: Moon };
@@ -23,7 +21,6 @@ export function Logo({ className }: { className?: string }) {
 }
 
 export default function TopBar() {
-  const [submitOpen, setSubmitOpen] = useState(false);
   const { t, locale } = useI18n();
   const themePref = useThemePref();
   const ThemeIcon = THEME_ICON[themePref];
@@ -64,17 +61,7 @@ export default function TopBar() {
         >
           <ThemeIcon className="w-4 h-4" />
         </button>
-
-        <button
-          type="button"
-          onClick={() => setSubmitOpen(true)}
-          className="flex items-center gap-1 rounded-full bg-fg px-3.5 h-8 text-sm font-medium text-page transition-transform hover:scale-[1.03] active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
-          <Plus className="w-4 h-4" />
-          {t.submit}
-        </button>
       </nav>
-      <SubmitDialog open={submitOpen} onClose={() => setSubmitOpen(false)} />
     </div>
   );
 }

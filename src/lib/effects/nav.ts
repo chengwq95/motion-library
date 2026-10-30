@@ -1,25 +1,25 @@
 import type { ContextKind, Locale, TriggerKind } from "../types";
 import { esc, times, w, type SnippetDef } from "./helpers";
 
-const nav = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], t: TriggerKind, css: string, html: SnippetDef["html"]): SnippetDef =>
+export const nav = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], t: TriggerKind, css: string, html: SnippetDef["html"]): SnippetDef =>
   ({ id, zh, en, c: "nav", t, m, css, html });
 
 // Preview links have no href so clicking them never leaves the page.
-const link = (t: string) => `<span class="$" role="link" tabindex="0">${esc(t)}</span>`;
-const linkBase = `.$ { position: relative; font-size: 7cqw; font-weight: 700; color: var(--fg); cursor: pointer; padding: 4px 2px; }`;
-const items = (t: string, l: Locale) => [t, w(l, "作品", "Work"), w(l, "关于", "About")];
+export const link = (t: string) => `<span class="$" role="link" tabindex="0">${esc(t)}</span>`;
+export const linkBase = `.$ { position: relative; font-size: 7cqw; font-weight: 700; color: var(--fg); cursor: pointer; padding: 4px 2px; }`;
+export const items = (t: string, l: Locale) => [t, w(l, "作品", "Work"), w(l, "关于", "About")];
 
-const underline = (id: string, zh: [string, string], en: [string, string], css: string): SnippetDef =>
+export const underline = (id: string, zh: [string, string], en: [string, string], css: string): SnippetDef =>
   nav(id, zh, en, ["elegant"], "hover", `${linkBase}\n${css}`, link);
 
 // Hamburger icons toggled with a hidden checkbox.
-const burgerBase = `.$ { position: relative; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); cursor: pointer; }
+export const burgerBase = `.$ { position: relative; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); cursor: pointer; }
 .$ i { position: absolute; left: 18px; right: 18px; height: 3px; border-radius: 3px; background: var(--fg); transition: transform .35s cubic-bezier(.65,0,.35,1), opacity .25s, width .35s, top .35s; }
 .$ i:nth-of-type(1) { top: 22px; } .$ i:nth-of-type(2) { top: 30px; } .$ i:nth-of-type(3) { top: 38px; }`;
-const burgerHtml = (_t: string, l: Locale) => `<label class="$" aria-label="${w(l, "菜单", "Menu")}"><input type="checkbox" hidden><i></i><i></i><i></i></label>`;
-const burger = (id: string, zh: [string, string], en: [string, string], css: string): SnippetDef =>
+export const burgerHtml = (_t: string, l: Locale) => `<label class="$" aria-label="${w(l, "菜单", "Menu")}"><input type="checkbox" hidden><i></i><i></i><i></i></label>`;
+export const burger = (id: string, zh: [string, string], en: [string, string], css: string): SnippetDef =>
   nav(id, zh, en, ["interactive"], "click", `${burgerBase}\n${css}`, burgerHtml);
-const on = (sel: string) => `.$:has(input:checked) ${sel}`;
+export const on = (sel: string) => `.$:has(input:checked) ${sel}`;
 
 export const navSnippets: SnippetDef[] = [
   underline("link-grow-left", ["下划线左起", "悬停时下划线从左向右长出。"], ["Underline From Left", "An underline grows left to right on hover."],

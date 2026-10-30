@@ -1,11 +1,11 @@
 import type { ContextKind, TriggerKind } from "../types";
 import { esc, rnd, times, w, type SnippetDef } from "./helpers";
 
-const data = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], css: string, html: SnippetDef["html"], o: { t?: TriggerKind; tech?: SnippetDef["tech"] } = {}): SnippetDef =>
+export const data = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], css: string, html: SnippetDef["html"], o: { t?: TriggerKind; tech?: SnippetDef["tech"] } = {}): SnippetDef =>
   ({ id, zh, en, c: "data", t: o.t ?? "auto", m, css, html, tech: o.tech });
 
 // Numbers that count use a registered integer property, so CSS alone can animate them.
-const counterProp = "@property --$-n { syntax: \"<integer>\"; initial-value: 0; inherits: false; }";
+export const counterProp = "@property --$-n { syntax: \"<integer>\"; initial-value: 0; inherits: false; }";
 
 export const dataSnippets: SnippetDef[] = [
   data("data-ring", ["进度圆环", "圆环进度从零画满，再重新开始。"], ["Progress Ring", "A ring of progress draws around to full, then restarts."], ["feedback"],

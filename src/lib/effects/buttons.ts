@@ -2,21 +2,21 @@ import type { ContextKind, TriggerKind } from "../types";
 import { esc, w, type SnippetDef } from "./helpers";
 
 // Shared base so every button starts from the same look.
-const base = `.$ { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; gap: .5em; padding: 14px 28px; border: 2px solid var(--fg); border-radius: 12px; background: transparent; color: var(--fg); font-family: inherit; font-weight: 700; font-size: 15px; line-height: 1; cursor: pointer; transition: color .35s, background-color .35s, transform .35s, box-shadow .35s, border-color .35s; }`;
+export const base = `.$ { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; gap: .5em; padding: 14px 28px; border: 2px solid var(--fg); border-radius: 12px; background: transparent; color: var(--fg); font-family: inherit; font-weight: 700; font-size: 15px; line-height: 1; cursor: pointer; transition: color .35s, background-color .35s, transform .35s, box-shadow .35s, border-color .35s; }`;
 
-const btn = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], css: string, o: { t?: TriggerKind; html?: SnippetDef["html"]; noBase?: boolean } = {}): SnippetDef => ({
+export const btn = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], css: string, o: { t?: TriggerKind; html?: SnippetDef["html"]; noBase?: boolean } = {}): SnippetDef => ({
   id, zh, en, c: "button", t: o.t ?? "hover", m,
   css: `${o.noBase ? "" : base}\n${css}`,
   html: o.html ?? ((t) => `<button class="$" type="button"><span>${esc(t)}</span></button>`),
 });
 
 // A pseudo-element that covers the button and slides in on hover.
-const fill = (from: string, to: string, extra = "") => `.$::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--fg); transform: ${from}; transition: transform .4s cubic-bezier(.65,0,.35,1); ${extra} }
+export const fill = (from: string, to: string, extra = "") => `.$::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--fg); transform: ${from}; transition: transform .4s cubic-bezier(.65,0,.35,1); ${extra} }
 .$:hover, .$:focus-visible { color: var(--page); }
 .$:hover::before, .$:focus-visible::before { transform: ${to}; }`;
 
 // A checkbox wrapped in a label lets pure CSS react to clicks.
-const toggle = (inner: string) => `<label class="$"><input type="checkbox" hidden>${inner}</label>`;
+export const toggle = (inner: string) => `<label class="$"><input type="checkbox" hidden>${inner}</label>`;
 
 export const buttonSnippets: SnippetDef[] = [
   btn("fill-left-btn", ["左侧填充", "悬停时颜色从左侧推满按钮。"], ["Fill From Left", "Color pushes in from the left on hover."], ["interactive"],

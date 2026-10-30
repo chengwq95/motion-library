@@ -4,14 +4,14 @@ import { charCss, charHtml, esc, list, times, type SnippetDef } from "./helpers"
 type Opts = Parameters<typeof charCss>[1];
 
 // Per-character effects: same keyframes on every character, staggered.
-const perChar = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], keyframes: string, o?: Opts): SnippetDef =>
+export const perChar = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], keyframes: string, o?: Opts): SnippetDef =>
   ({ id, zh, en, c: "text", t: "auto", m, css: charCss(keyframes, o), html: charHtml });
 
 // Whole-word effects.
-const word = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], css: string, html?: SnippetDef["html"], extra?: Partial<SnippetDef>): SnippetDef =>
+export const word = (id: string, zh: [string, string], en: [string, string], m: ContextKind[], css: string, html?: SnippetDef["html"], extra?: Partial<SnippetDef>): SnippetDef =>
   ({ id, zh, en, c: "text", t: "auto", m, css, html: html ?? ((t) => `<div class="$">${esc(t)}</div>`), ...extra });
 
-const big = "font-weight: 900; font-size: 14cqw; line-height: 1.1; white-space: nowrap;";
+export const big = "font-weight: 900; font-size: 14cqw; line-height: 1.1; white-space: nowrap;";
 
 export const textSnippets: SnippetDef[] = [
   perChar("wave-text", ["波浪文字", "文字依次上下起伏，像水面的波浪。"], ["Wave Text", "Letters rise and fall one after another like a wave."], ["showcase"],
