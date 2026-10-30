@@ -1,6 +1,6 @@
 # Motion Library 动效收藏
 
-用 Next.js、React 和 TypeScript 制作的网页动效收藏示范，参考 [Motion Library](https://kittenjam-motion-library.vercel.app/)。
+用 Next.js、React 和 TypeScript 制作的网页动效收藏：可以搜索、筛选和试玩网页动效，并一键复制 AI 提示词。
 
 ## 本地运行
 
@@ -14,6 +14,14 @@ npm run dev
 打开 http://localhost:3000。生产环境先运行 `npm run build`，再运行 `npm start`。
 
 部署时请设置环境变量 `NEXT_PUBLIC_SITE_URL`（例如 `https://example.com`），分享预览图和 sitemap 会用到网站的完整网址；部署在 Vercel 上时会自动使用 Vercel 的正式网址。
+
+## 单文件 HTML
+
+`standalone/motion-library.html` 是整个网站打包成的单个 HTML 文件，双击就能在浏览器打开，不需要服务器或网络，功能和网站相同（详情页用 `#/effects/<id>` 的网址）。修改代码后重新生成：
+
+```bash
+npm run build:html
+```
 
 ## 功能
 
@@ -54,6 +62,7 @@ npx playwright install chromium
 - `src/lib/prefs.ts`：主题、语言与收藏；`query.ts`：筛选条件与网址的互相转换。
 - `src/components/`：顶栏、筛选、卡片、详情页等组件；`previews/` 为各动效预览。
 - `e2e/`：Playwright 浏览器测试。
+- `scripts/`：单文件 HTML 的打包脚本。
 
 新增动效时，先在 `src/components/previews/` 建立预览组件，再把它加入 `AnimationRegistry.tsx`，最后在 `animations.ts` 补上中英文资料，详情页和分享图会自动生成。颜色请使用 `bg-page`、`bg-card`、`text-fg`、`text-muted`、`border-line`、`bg-stage`、`bg-accent` 等主题变量，深浅色会自动适配；会循环播放的 JS 动画请读取 `paused` 属性，在不可见时暂停。
 
