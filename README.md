@@ -4,6 +4,42 @@ A collection of 500 web animation effects you can search, filter and try out in 
 
 Built with Next.js, React, TypeScript and Tailwind CSS. The interface is available in Simplified Chinese and English, with light and dark themes.
 
+## Preview
+
+**Dark mode · Simplified Chinese**
+
+![Motion Library home page in dark mode](docs/images/overview-dark.png)
+
+**Light mode · Search and filters**
+
+![Light mode library with categories, filters and live previews](docs/images/library-light.png)
+
+**Effect details · Live preview and code export**
+
+![Effect detail page with preview controls and React code](docs/images/effect-detail.png)
+
+## From idea to code
+
+1. **Find an effect.** Search by name or tag, combine filters, or use “Surprise me” to explore.
+2. **Try it out.** Open the effect page and change the preview background, speed or width. Test hover, click and drag effects directly.
+3. **Make it yours.** Copy the AI prompt into your coding assistant, or copy/download HTML, CSS, React, Vue or a standalone HTML file. Adjust the included color variables to match your project.
+
+## The collection
+
+| Category | Effects |
+| --- | ---: |
+| Text | 122 |
+| Buttons | 72 |
+| Cards | 52 |
+| Navigation | 40 |
+| Form controls | 44 |
+| Loaders | 64 |
+| Backgrounds | 50 |
+| Icons | 34 |
+| Data | 20 |
+| Cursors | 2 |
+| **Total** | **500** |
+
 ## Features
 
 **Browsing**
@@ -28,4 +64,13 @@ Built with Next.js, React, TypeScript and Tailwind CSS. The interface is availab
 - Light, dark or system theme, remembered between visits and applied without a flash.
 - Previews only render while on screen, and looping animations pause when scrolled away.
 - Share images (Open Graph) use a real screenshot of each effect. A sitemap and robots.txt are generated.
-- Keyboard: `/` focuses search and `Esc` clears it. The site respects the system's reduced-motion setting.
+- Keyboard navigation and the system's reduced-motion setting are supported.
+
+## Keyboard shortcuts
+
+| Key | Action |
+| --- | --- |
+| `/` | Focus search on the library page |
+| `Esc` | Clear search |
+| `R` | Open a random effect |
+| `←` / `→` | Open the previous / next effect on a detail page |
