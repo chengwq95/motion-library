@@ -1,319 +1,242 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { animations } from "@/lib/animations";
-import { COMPONENTS, TRIGGERS, CONTEXTS, TECHS } from "@/lib/types";
-import { previewRegistry } from "@/components/AnimationRegistry";
-import { Copy, ChevronUp } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowUp, Search, Type, X } from "lucide-react";
 import { toast, Toaster } from "sonner";
+import { animations } from "@/lib/animations";
+import { dict, useI18n } from "@/lib/i18n";
+import { useTheme } from "@/lib/prefs";
+import { COMPONENTS, CONTEXTS, TECHS, TRIGGERS, type AnimationItem, type ComponentKind } from "@/lib/types";
+import TopBar from "@/components/TopBar";
+import FilterRow from "@/components/FilterRow";
+import AnimationCard from "@/components/AnimationCard";
+import SubmitDialog from "@/components/SubmitDialog";
+
+const ALL = "all";
+type Filters = { component: string; trigger: string; context: string; tech: string };
+const NO_FILTERS: Filters = { component: ALL, trigger: ALL, context: ALL, tech: ALL };
+
+function matchesFilters(a: AnimationItem, f: Filters) {
+  return (f.component === ALL || a.component === f.component)
+    && (f.trigger === ALL || a.trigger === f.trigger)
+    && (f.context === ALL || (a.contexts as readonly string[]).includes(f.context))
+    && (f.tech === ALL || a.tech === f.tech);
+}
+
+// Search both languages so a query works whichever UI language is active.
+function searchText(a: AnimationItem) {
+  const labels = Object.values(dict).flatMap((d) => [d.components[a.component], d.triggers[a.trigger], ...a.contexts.map((c) => d.contexts[c])]);
+  return [a.name.zh, a.name.en, a.description.zh, a.description.en, a.tech, ...a.tags, ...labels].join(" ").toLowerCase();
+}
+const SEARCH_INDEX = new Map(animations.map((a) => [a.id, searchText(a)]));
+
+const inputClass = "w-full rounded-xl border border-line bg-page py-2.5 pl-10 pr-10 text-sm outline-none transition-colors placeholder:text-muted focus:border-accent";
 
 export default function Home() {
+  const { t, locale } = useI18n();
+  const theme = useTheme();
   const [search, setSearch] = useState("");
   const [previewText, setPreviewText] = useState("");
-  const [component, setComponent] = useState("全部元件");
-  const [trigger, setTrigger] = useState("全部時機");
-  const [context, setContext] = useState("全部情境");
-  const [tech, setTech] = useState("全部技術");
-  const [groupBy, setGroupBy] = useState("comp");
-  const [showModal, setShowModal] = useState(false);
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    if (showModal) dialogRef.current?.showModal();
-    else dialogRef.current?.close();
-  }, [showModal]);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  const [grouped, setGrouped] = useState(true);
+  const [submitOpen, setSubmitOpen] = useState(false);
   const [showBackTop, setShowBackTop] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setShowBackTop(window.scrollY > 400);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => setShowBackTop(window.scrollY > 600);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const filtered = useMemo(() => {
-    return animations.filter((a) => {
-      const q = search.toLowerCase();
-      const matchSearch =
-        !q ||
-        a.name.toLowerCase().includes(q) ||
-        a.nameEn.toLowerCase().includes(q) ||
-        a.description.toLowerCase().includes(q) ||
-        a.tags.some((t) => t.toLowerCase().includes(q));
-      const matchComp = component === "全部元件" || a.component === component;
-      const matchTrig = trigger === "全部時機" || a.trigger === trigger;
-      const matchCtx = context === "全部情境" || a.contexts.includes(context);
-      const matchTech = tech === "全部技術" || a.tech === tech;
-      return matchSearch && matchComp && matchTrig && matchCtx && matchTech;
-    });
-  }, [search, component, trigger, context, tech]);
-
-  const grouped = useMemo(() => {
-    if (groupBy !== "comp") return { all: filtered };
-    const groups: Record<string, typeof filtered> = {};
-    filtered.forEach((a) => {
-      if (!groups[a.component]) groups[a.component] = [];
-      groups[a.component].push(a);
-    });
-    return groups;
-  }, [filtered, groupBy]);
-
-  const copyPrompt = useCallback(async (item: (typeof animations)[0]) => {
-    try {
-      await navigator.clipboard.writeText(item.aiPrompt);
-      setCopiedId(item.id);
-      toast.success("已複製 ✓");
-      setTimeout(() => setCopiedId(null), 2000);
-    } catch {
-      toast.error("複製失敗");
-    }
+  // "/" focuses the search box, as on many docs sites.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      if ((e.target as HTMLElement).closest("input, textarea, select, [contenteditable='true']")) return;
+      e.preventDefault();
+      searchRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const clearFilters = () => {
+  const searched = useMemo(() => {
+    const terms = search.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    return animations.filter((a) => terms.every((term) => SEARCH_INDEX.get(a.id)!.includes(term)));
+  }, [search]);
+
+  const filtered = useMemo(() => searched.filter((a) => matchesFilters(a, filters)), [searched, filters]);
+
+  const groups = useMemo<[ComponentKind | null, AnimationItem[]][]>(() => {
+    if (!grouped) return [[null, filtered]];
+    return COMPONENTS
+      .map((c) => [c, filtered.filter((a) => a.component === c)] as [ComponentKind, AnimationItem[]])
+      .filter(([, items]) => items.length > 0);
+  }, [filtered, grouped]);
+
+  // Faceted counts: how many results each chip would give with the other filters kept.
+  const optionsFor = (key: keyof Filters, values: readonly string[], label: (v: string) => string) =>
+    [ALL, ...values].map((value) => ({
+      value,
+      label: value === ALL ? t.all : label(value),
+      count: searched.filter((a) => matchesFilters(a, { ...filters, [key]: value })).length,
+    }));
+
+  const setFilter = (key: keyof Filters) => (value: string) => setFilters((f) => ({ ...f, [key]: value }));
+
+  const copyPrompt = useCallback(async (item: AnimationItem) => {
+    try {
+      await navigator.clipboard.writeText(item.aiPrompt[locale]);
+      toast.success(t.copiedToast);
+      return true;
+    } catch {
+      toast.error(t.copyFailed);
+      return false;
+    }
+  }, [locale, t]);
+
+  const hasFilters = search !== "" || previewText !== "" || Object.values(filters).some((v) => v !== ALL);
+  const clearAll = () => {
     setSearch("");
-    setComponent("全部元件");
-    setTrigger("全部時機");
-    setContext("全部情境");
-    setTech("全部技術");
     setPreviewText("");
+    setFilters(NO_FILTERS);
   };
 
   return (
-    <div className="min-h-screen bg-[#0d0e11] text-[#f2f2f0]">
-      <Toaster position="top-center" />
-      {/* Header */}
-      <header className="max-w-[1200px] mx-auto px-6 pt-12 pb-8">
-        <div className="text-xs tracking-widest text-white/50 mb-2">MOTION LIBRARY / 動態收藏</div>
-        <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
-          動態收藏 <span className="font-medium">Motion Library</span>
-        </h1>
-        <p className="text-sm md:text-base text-white/70 max-w-2xl leading-relaxed">
-          收錄網頁上好看的動態效果，目前共 <span className="text-white font-medium">{animations.length}</span> 種。
-          可以用「元件」和「時機」交叉篩選，例如「按鈕 × 懸停」、「卡片・群組 × 進場」。
-          每格都是示意預覽，點「複製 AI 提示詞」可取得外觀與做法描述；互動類的效果可以直接用滑鼠移動、捲動或拖曳試玩。
-        </p>
+    <div id="top" className="min-h-screen">
+      <Toaster position="top-center" theme={theme} />
+      <TopBar onSubmit={() => setSubmitOpen(true)} />
+
+      <header className="relative overflow-hidden">
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-40 h-[560px] bg-[radial-gradient(50%_50%_at_50%_50%,color-mix(in_oklab,var(--accent)_22%,transparent),transparent)]" />
+        <div className="relative max-w-[1200px] mx-auto px-4 sm:px-6 pt-14 pb-10 sm:pt-20 sm:pb-12">
+          <p className="inline-flex items-center gap-2 rounded-full border border-line bg-card/60 px-3 py-1 text-xs text-muted backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent motion-safe:animate-pulse" />
+            {t.heroEyebrow(animations.length)}
+          </p>
+          <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[1.1] tracking-tight sm:text-6xl">
+            {t.heroTitle}
+            <br />
+            <span className="text-accent">{t.heroAccent}</span>
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">{t.heroDesc}</p>
+        </div>
       </header>
 
-      {/* Filters */}
-      <div className="max-w-[1200px] mx-auto px-6 pb-6 space-y-4">
-        <div className="flex flex-col md:flex-row gap-3">
-          <input
-            type="search"
-            aria-label="搜尋動畫"
-            placeholder="搜尋名稱、描述或標籤（例：翻牌、按鈕、Bounce）"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-[#17181d] border border-[#2a2c33] rounded-xl px-4 py-3 text-sm outline-none focus:border-white/30"
-          />
-          <input
-            type="text"
-            aria-label="自訂預覽文字"
-            maxLength={24}
-            placeholder="自訂預覽文字（留空用原範例）"
-            value={previewText}
-            onChange={(e) => setPreviewText(e.target.value)}
-            className="flex-1 bg-[#17181d] border border-[#2a2c33] rounded-xl px-4 py-3 text-sm outline-none focus:border-white/30"
-          />
+      <section aria-label={t.filtersLabel} className="max-w-[1200px] mx-auto px-4 sm:px-6">
+        <div className="space-y-4 rounded-2xl border border-line bg-card p-4 shadow-sm sm:p-5">
+          <div className="grid gap-3 md:grid-cols-[1fr_minmax(0,320px)]">
+            <div className="relative">
+              <Search aria-hidden className="pointer-events-none absolute left-3.5 top-1/2 w-4 h-4 -translate-y-1/2 text-muted" />
+              <input
+                ref={searchRef}
+                type="search"
+                aria-label={t.searchLabel}
+                placeholder={t.searchPlaceholder}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Escape" && setSearch("")}
+                className={`${inputClass} [&::-webkit-search-cancel-button]:hidden`}
+              />
+              {search ? (
+                <button type="button" aria-label={t.clear} onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 grid place-items-center w-6 h-6 -translate-y-1/2 rounded-full text-muted hover:bg-fg/5 hover:text-fg">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-line px-1.5 font-mono text-[11px] text-muted sm:block">/</kbd>
+              )}
+            </div>
+            <div className="relative">
+              <Type aria-hidden className="pointer-events-none absolute left-3.5 top-1/2 w-4 h-4 -translate-y-1/2 text-muted" />
+              <input
+                type="text"
+                aria-label={t.previewTextLabel}
+                maxLength={24}
+                placeholder={t.previewTextPlaceholder}
+                value={previewText}
+                onChange={(e) => setPreviewText(e.target.value)}
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2.5">
+            <FilterRow label={t.filterComponent} value={filters.component} onChange={setFilter("component")}
+              options={optionsFor("component", COMPONENTS, (v) => t.components[v as ComponentKind])} />
+            <FilterRow label={t.filterTrigger} value={filters.trigger} onChange={setFilter("trigger")}
+              options={optionsFor("trigger", TRIGGERS, (v) => t.triggers[v as keyof typeof t.triggers])} />
+            <FilterRow label={t.filterContext} value={filters.context} onChange={setFilter("context")}
+              options={optionsFor("context", CONTEXTS, (v) => t.contexts[v as keyof typeof t.contexts])} />
+            <FilterRow label={t.filterTech} value={filters.tech} onChange={setFilter("tech")}
+              options={optionsFor("tech", TECHS, (v) => v)} />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 border-t border-line pt-4 text-sm">
+            <span aria-live="polite" className="text-muted">{t.showing(filtered.length, animations.length)}</span>
+            <div className="ml-auto flex items-center gap-2">
+              <div role="group" aria-label={t.groupLabel} className="flex rounded-full border border-line p-0.5 text-xs">
+                {[{ value: true, label: t.groupByComponent }, { value: false, label: t.groupNone }].map((o) => (
+                  <button key={String(o.value)} type="button" aria-pressed={grouped === o.value} onClick={() => setGrouped(o.value)}
+                    className="rounded-full px-3 py-1 text-muted transition-colors hover:text-fg aria-pressed:bg-fg aria-pressed:text-page">
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+              <button type="button" onClick={clearAll} disabled={!hasFilters}
+                className="flex items-center gap-1 rounded-full px-3 py-1 text-xs text-muted transition-colors hover:bg-fg/5 hover:text-fg disabled:pointer-events-none disabled:opacity-40">
+                <X className="w-3.5 h-3.5" />
+                {t.clear}
+              </button>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="flex flex-wrap gap-3 items-center">
-          <select
-            aria-label="元件"
-            value={component}
-            onChange={(e) => setComponent(e.target.value)}
-            className="bg-[#17181d] border border-[#2a2c33] rounded-xl px-3 py-2 text-sm"
-          >
-            {COMPONENTS.map((c) => (
-              <option key={c} value={c}>
-                {c}（{c === "全部元件" ? animations.length : animations.filter((a) => a.component === c).length}）
-              </option>
-            ))}
-          </select>
-          <select
-            aria-label="時機"
-            value={trigger}
-            onChange={(e) => setTrigger(e.target.value)}
-            className="bg-[#17181d] border border-[#2a2c33] rounded-xl px-3 py-2 text-sm"
-          >
-            {TRIGGERS.map((t) => (
-              <option key={t} value={t}>
-                {t}（{t === "全部時機" ? animations.length : animations.filter((a) => a.trigger === t).length}）
-              </option>
-            ))}
-          </select>
-          <select
-            aria-label="情境"
-            value={context}
-            onChange={(e) => setContext(e.target.value)}
-            className="bg-[#17181d] border border-[#2a2c33] rounded-xl px-3 py-2 text-sm"
-          >
-            {CONTEXTS.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          <select
-            aria-label="技術"
-            value={tech}
-            onChange={(e) => setTech(e.target.value)}
-            className="bg-[#17181d] border border-[#2a2c33] rounded-xl px-3 py-2 text-sm"
-          >
-            {TECHS.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-          <select aria-label="分組方式" value={groupBy} onChange={e => setGroupBy(e.target.value)} className="bg-[#17181d] border border-[#2a2c33] rounded-xl px-3 py-2 text-sm"><option value="comp">依元件分組</option><option value="all">全部顯示</option></select>
-          <button
-            onClick={clearFilters}
-            className="ml-auto text-sm text-white/60 hover:text-white flex items-center gap-1"
-          >
-            清除 <ChevronUp className="w-4 h-4 rotate-180" />
-          </button>
-        </div>
-
-        <div className="text-sm text-white/50">顯示 {filtered.length} / {animations.length}</div>
-      </div>
-
-      {/* Cards */}
-      <main className="max-w-[1200px] mx-auto px-6 pb-24">
-        {Object.entries(grouped).map(([groupName, items]) => (
-          <section key={groupName} className="mb-12">
-            {groupBy === "comp" && groupName !== "all" && (
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                {groupName}
-                <span className="text-sm font-normal text-white/50">{items.length} 種</span>
+      <main className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-10 pb-24">
+        {filtered.length > 0 ? groups.map(([kind, items]) => (
+          <section key={kind ?? ALL} className="mb-12 last:mb-0">
+            {kind && (
+              <h2 className="mb-4 flex items-baseline gap-2 text-xl font-bold">
+                {t.components[kind]}
+                <span className="text-sm font-normal text-muted">{t.countUnit(items.length)}</span>
               </h2>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {items.map((item) => {
-                const Preview = previewRegistry[item.previewComponent];
-                return (
-                  <article
-                    key={item.id}
-                    className="bg-[#17181d] border border-[#2a2c33] rounded-[18px] overflow-hidden hover:border-white/20 transition-colors"
-                  >
-                    <div className="h-[200px] relative bg-[#15161a] [container-type:inline-size]">
-                      {Preview ? (
-                        <Preview text={previewText || undefined} />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-white/40">
-                          Preview
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <div>
-                          <div className="text-xs text-white/40 mb-0.5">{item.number}</div>
-                          <div className="font-medium">
-                            {item.name}{" "}
-                            <span className="text-white/50 text-sm">{item.nameEn}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-sm text-white/70 mb-2">{item.description}</p>
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10">{item.trigger}</span>
-                        {item.contexts.slice(0, 2).map((c) => (
-                          <span key={c} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/60">
-                            {c}
-                          </span>
-                        ))}
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/50">{item.tech}</span>
-                      </div>
-                      <button
-                        onClick={() => copyPrompt(item)}
-                        className="w-full flex items-center justify-center gap-2 text-sm py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                      >
-                        <Copy className="w-4 h-4" />
-                        {copiedId === item.id ? "已複製 ✓" : "複製 AI 提示詞"}
-                      </button>
-                    </div>
-                  </article>
-                );
-              })}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+              {items.map((item) => <AnimationCard key={item.id} item={item} previewText={previewText} onCopy={copyPrompt} />)}
             </div>
           </section>
-        ))}
-
-        {filtered.length === 0 && (
-          <div className="text-center py-20 text-white/40">沒有符合條件的效果</div>
+        )) : (
+          <div className="rounded-2xl border border-dashed border-line py-20 text-center">
+            <p className="text-muted">{t.empty}</p>
+            <button type="button" onClick={clearAll} className="mt-4 rounded-full border border-line px-4 py-1.5 text-sm hover:bg-fg/5">{t.clear}</button>
+          </div>
         )}
       </main>
 
-      {/* Floating buttons */}
-      <button
-        onClick={() => setShowModal(true)}
-        className="fixed bottom-6 right-6 bg-white text-black px-4 py-2 rounded-full text-sm font-medium shadow-lg hover:scale-105 transition-transform z-40"
-      >
-        我要投稿
-      </button>
+      <footer className="border-t border-line">
+        <div className="max-w-[1200px] mx-auto flex flex-col gap-3 px-4 py-8 text-xs leading-relaxed text-muted sm:flex-row sm:justify-between sm:px-6">
+          <p className="max-w-xl">{t.footerNote}</p>
+          <p className="flex flex-wrap gap-x-3 gap-y-1">
+            <span>{t.sources}:</span>
+            <a href="https://www.threads.com/@ai_yunon_ai/post/DeeJRUjkXlM" target="_blank" rel="noreferrer" className="underline-offset-2 hover:text-fg hover:underline">@ai_yunon_ai</a>
+            <a href="https://www.threads.com/@ai_tjb/post/DeeHoA3ktZ5" target="_blank" rel="noreferrer" className="underline-offset-2 hover:text-fg hover:underline">@ai_tjb</a>
+          </p>
+        </div>
+      </footer>
 
       {showBackTop && (
         <button
-          aria-label="回到頂部"
+          type="button"
+          aria-label={t.backTop}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-20 right-6 bg-[#17181d] border border-[#2a2c33] p-3 rounded-full z-40"
+          className="fixed bottom-6 right-6 z-30 grid place-items-center w-11 h-11 rounded-full border border-line bg-card shadow-lg transition-transform hover:-translate-y-0.5"
         >
-          <ChevronUp className="w-5 h-5" />
+          <ArrowUp className="w-5 h-5" />
         </button>
       )}
 
-      {/* Submission Modal */}
-      <dialog ref={dialogRef} onCancel={() => setShowModal(false)} onClose={() => setShowModal(false)} aria-labelledby="submission-title" className="fixed inset-0 m-auto w-full max-w-md bg-transparent p-4 text-[#f2f2f0] backdrop:bg-black/70">
-          <div className="bg-[#17181d] border border-[#2a2c33] rounded-2xl max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 id="submission-title" className="text-lg font-bold">投稿想收錄的效果</h3>
-              <button aria-label="關閉投稿視窗" onClick={() => setShowModal(false)} className="text-white/50 hover:text-white">
-                ×
-              </button>
-            </div>
-            <p className="text-sm text-white/70 mb-4">此為表單示範，資料不會送出或保存。</p>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                toast.success("示範完成，資料未送出或保存");
-                setShowModal(false);
-              }}
-              className="space-y-3"
-            >
-              <input
-                aria-label="效果名稱或描述" placeholder="效果名稱或描述"
-                className="w-full bg-[#0d0e11] border border-[#2a2c33] rounded-lg px-3 py-2 text-sm"
-                required
-              />
-              <input
-                aria-label="參考連結（選填）" placeholder="參考連結（選填）" type="url"
-                className="w-full bg-[#0d0e11] border border-[#2a2c33] rounded-lg px-3 py-2 text-sm"
-              />
-              <input
-                aria-label="投稿人稱呼（選填）" placeholder="投稿人稱呼（選填）"
-                className="w-full bg-[#0d0e11] border border-[#2a2c33] rounded-lg px-3 py-2 text-sm"
-              />
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 py-2 rounded-lg border border-[#2a2c33] text-sm"
-                >
-                  取消
-                </button>
-                <button type="submit" className="flex-1 py-2 rounded-lg bg-white text-black text-sm font-medium">
-                  送出投稿
-                </button>
-              </div>
-            </form>
-          </div>
-      </dialog>
-
-      {/* Footer */}
-      <footer className="max-w-[1200px] mx-auto px-6 py-8 text-xs text-white/40 border-t border-[#2a2c33]">
-        參考來源：threads.com/@ai_yunon_ai/post/DeeJRUjkXlM ・ threads.com/@ai_tjb/post/DeeHoA3ktZ5 ・
-        名稱與描述屬原作者整理，預覽動畫為示意重製，僅供個人參考學習。GSAP 動畫以 GSAP 自行整理示範。
-      </footer>
+      <SubmitDialog open={submitOpen} onClose={() => setSubmitOpen(false)} />
     </div>
   );
 }

@@ -2,163 +2,139 @@ import type { AnimationItem } from "./types";
 
 export const animations: AnimationItem[] = [
   {
-    "id": "lightning",
-    "number": "001",
-    "name": "閃電砸落",
-    "nameEn": "Lightning Strike",
-    "description": "文字隨閃電快速落下，搭配短暫閃光。",
-    "component": "文字",
-    "trigger": "自動",
-    "contexts": [
-      "衝擊",
-      "科技"
-    ],
-    "tech": "GSAP",
-    "tags": [
-      "閃電",
-      "Lightning"
-    ],
-    "previewComponent": "LightningStrike",
-    "aiPrompt": "用 React 和 GSAP 建立深色舞台的文字閃電動畫：文字從上方 40px 落下，透明度由 0 到 1，加入短暫發光與微幅震動，停留後循環播放。以 gsap.context 清理時間軸，並尊重 prefers-reduced-motion。"
+    id: "lightning",
+    number: "001",
+    name: { zh: "闪电砸落", en: "Lightning Strike" },
+    description: { zh: "文字随闪电快速落下，伴随短暂闪光。", en: "Text drops in with a lightning flash." },
+    sample: { zh: "闪电", en: "ZAP" },
+    component: "text",
+    trigger: "auto",
+    contexts: ["impact", "tech"],
+    tech: "GSAP",
+    tags: ["闪电", "Lightning", "Flash"],
+    previewComponent: "LightningStrike",
+    aiPrompt: {
+      zh: "用 React 和 GSAP 在深色舞台上制作文字闪电动画：文字从上方 40px 落下，透明度从 0 到 1；落地瞬间叠加一层靛蓝色闪光并淡出，文字再水平微震 3 次，停顿后循环播放。用 gsap.matchMedia 在 prefers-reduced-motion 时停用动画，并在卸载时 revert 清理。",
+      en: "Build a text lightning animation with React and GSAP on a dark stage: the text drops 40px from above while fading from 0 to 1; on impact, flash an indigo overlay that fades out, then shake the text horizontally 3 times, pause and loop. Use gsap.matchMedia to disable it under prefers-reduced-motion and revert on unmount.",
+    },
   },
   {
-    "id": "laser",
-    "number": "002",
-    "name": "雷射切斷",
-    "nameEn": "Laser Cut",
-    "description": "紅色雷射劃過文字，上下兩半略微錯開。",
-    "component": "文字",
-    "trigger": "自動",
-    "contexts": [
-      "科技",
-      "衝擊"
-    ],
-    "tech": "CSS",
-    "tags": [
-      "雷射",
-      "切斷",
-      "Laser"
-    ],
-    "previewComponent": "LaserCut",
-    "aiPrompt": "用 React 和 CSS 製作白底黑字的雷射切斷效果。用兩份文字與 clip-path 分別顯示上下半部，讓紅色 2px 雷射水平掃過，再將下半部向下位移 4px。舞台使用 container-type: inline-size，字級隨舞台寬度縮放，提供減少動態版本。"
+    id: "laser",
+    number: "002",
+    name: { zh: "激光切断", en: "Laser Cut" },
+    description: { zh: "红色激光划过文字，上下两半随之错开。", en: "A red laser slices the text and the halves slip apart." },
+    sample: { zh: "切断", en: "CUT" },
+    component: "text",
+    trigger: "auto",
+    contexts: ["tech", "impact"],
+    tech: "CSS",
+    tags: ["激光", "切断", "Laser", "Slice"],
+    previewComponent: "LaserCut",
+    aiPrompt: {
+      zh: "用 React 和 CSS 制作白底黑字的激光切断效果：叠放两份文字，用 clip-path 分别显示上半和下半；红色 2px 激光从左到右扫过，扫过后下半部向下错开 4px、略微右移，停顿后复原并循环。舞台设置 container-type: inline-size，字号随舞台宽度缩放，并提供减少动态的静态版本。",
+      en: "Create a laser-cut effect with React and CSS, black text on white: stack two copies of the text and use clip-path to show the top and bottom halves; a 2px red laser sweeps left to right, then the bottom half slips down 4px and slightly right, holds, resets and loops. Use container-type: inline-size so the font scales with the stage, and provide a static reduced-motion version.",
+    },
   },
   {
-    "id": "coin",
-    "number": "003",
-    "name": "硬幣翻轉",
-    "nameEn": "Coin Flip",
-    "description": "每個字依序沿 Y 軸翻轉，如同硬幣翻面。",
-    "component": "文字",
-    "trigger": "自動",
-    "contexts": [
-      "遊戲"
-    ],
-    "tech": "CSS",
-    "tags": [
-      "翻牌",
-      "硬幣",
-      "Flip"
-    ],
-    "previewComponent": "CoinFlip",
-    "aiPrompt": "以 React 拆分文字字元，使用 CSS rotateY 在 0 到 180 度間來回翻轉。每個字延遲 100ms，單次循環 1.2 秒，父層加入 1000px perspective。米白背景、粗黑文字，字級相對舞台寬度，支援自訂文字及減少動態偏好。"
+    id: "coin",
+    number: "003",
+    name: { zh: "硬币翻转", en: "Coin Flip" },
+    description: { zh: "每个字依次沿 Y 轴翻转，像抛硬币一样。", en: "Each character flips on the Y axis like a tossed coin." },
+    sample: { zh: "正面反面", en: "FLIP" },
+    component: "text",
+    trigger: "auto",
+    contexts: ["game"],
+    tech: "CSS",
+    tags: ["翻牌", "硬币", "Flip", "Coin"],
+    previewComponent: "CoinFlip",
+    aiPrompt: {
+      zh: "用 React 把文字拆成单个字符，以 CSS rotateY 在 0 到 180 度之间来回翻转，每个字延迟 100ms，单次循环 1.2 秒，父层加 1000px perspective。米白背景、粗黑文字，字号相对舞台宽度，支持自定义文字与减少动态偏好。用 Array.from 拆字以兼容 emoji。",
+      en: "Split text into characters in React and flip each one between 0 and 180 degrees with CSS rotateY, staggering by 100ms over a 1.2s loop, with a 1000px perspective on the parent. Cream background, heavy black text sized relative to the stage width; support custom text and reduced motion. Split with Array.from so emoji stay intact.",
+    },
   },
   {
-    "id": "explode",
-    "number": "004",
-    "name": "爆炸四散",
-    "nameEn": "Explode Out",
-    "description": "字元向不同方向飛散後重新聚合。",
-    "component": "文字",
-    "trigger": "自動",
-    "contexts": [
-      "衝擊"
-    ],
-    "tech": "CSS",
-    "tags": [
-      "爆炸",
-      "Explode"
-    ],
-    "previewComponent": "ExplodeOut",
-    "aiPrompt": "製作深色背景、白色粗體的字元爆炸效果。依照字元索引計算穩定的飛散方向與旋轉角度，使用 CSS 自訂屬性傳入動畫，讓字元位移、旋轉、縮小並淡出後重現。不要在 render 中用 Math.random，避免 SSR hydration 不一致，尊重 prefers-reduced-motion。"
+    id: "explode",
+    number: "004",
+    name: { zh: "爆炸四散", en: "Explode Out" },
+    description: { zh: "字符向四周飞散，再重新聚合。", en: "Characters burst outward, then regroup." },
+    sample: { zh: "爆炸", en: "BOOM" },
+    component: "text",
+    trigger: "auto",
+    contexts: ["impact"],
+    tech: "CSS",
+    tags: ["爆炸", "Explode", "Burst"],
+    previewComponent: "ExplodeOut",
+    aiPrompt: {
+      zh: "制作粗体文字的字符爆炸效果：按字符索引计算稳定的飞散方向和旋转角度，通过 CSS 自定义属性传给动画，让字符位移、旋转、缩小并淡出后再聚合。不要在 render 中使用 Math.random，以免 SSR 水合不一致；尊重 prefers-reduced-motion。",
+      en: "Build a character explosion effect with bold text: derive a stable direction and rotation from each character's index, pass them to the animation via CSS custom properties, and have characters fly out, spin, shrink and fade before regrouping. Avoid Math.random in render to prevent SSR hydration mismatches, and respect prefers-reduced-motion.",
+    },
   },
   {
-    "id": "button",
-    "number": "005",
-    "name": "按鈕懸停",
-    "nameEn": "Button Hover",
-    "description": "滑鼠懸停放大，按下時輕微縮小。",
-    "component": "按鈕",
-    "trigger": "懸停",
-    "contexts": [
-      "互動"
-    ],
-    "tech": "CSS",
-    "tags": [
-      "按鈕",
-      "Hover",
-      "Bounce"
-    ],
-    "previewComponent": "ButtonHover",
-    "aiPrompt": "用 React 和 Tailwind CSS 建立深色舞台上的白色圓角按鈕。懸停或鍵盤聚焦時放大到 1.05 倍，按下時縮小到 0.95 倍，過渡 200ms。保留清楚的 focus-visible 外框，文字可自訂，減少動態模式停用縮放。"
+    id: "button",
+    number: "005",
+    name: { zh: "按钮悬停", en: "Button Hover" },
+    description: { zh: "鼠标悬停时放大，按下时轻微缩小。", en: "Grows on hover and squishes slightly on press." },
+    sample: { zh: "悬停我", en: "Hover me" },
+    component: "button",
+    trigger: "hover",
+    contexts: ["interactive"],
+    tech: "CSS",
+    tags: ["按钮", "Hover", "Bounce"],
+    previewComponent: "ButtonHover",
+    aiPrompt: {
+      zh: "用 React 和 Tailwind CSS 制作圆角按钮：悬停或键盘聚焦时放大到 1.05 倍，按下时缩小到 0.95 倍，过渡 200ms。保留清晰的 focus-visible 外框，文字可自定义，减少动态模式下停用缩放。",
+      en: "With React and Tailwind CSS, build a rounded button that scales to 1.05 on hover or keyboard focus and to 0.95 when pressed, with a 200ms transition. Keep a clear focus-visible outline, allow custom text, and disable scaling in reduced-motion mode.",
+    },
   },
   {
-    "id": "card",
-    "number": "006",
-    "name": "卡片進場",
-    "nameEn": "Card Entrance",
-    "description": "卡片由下方滑入並漸顯，點擊可重播。",
-    "component": "卡片・群組",
-    "trigger": "進場",
-    "contexts": [
-      "內容展示"
-    ],
-    "tech": "CSS",
-    "tags": [
-      "卡片",
-      "進場"
-    ],
-    "previewComponent": "CardEntrance",
-    "aiPrompt": "用 React 和 CSS 做卡片進場預覽：灰色圓角卡片由下方 20px 移到原位，透明度由 0 到 1，時間 500ms，ease-out。使用按鈕包覆舞台以支援滑鼠與鍵盤重播，自訂文字顯示在卡片內，並提供 reduced-motion 靜態版本。"
+    id: "card",
+    number: "006",
+    name: { zh: "卡片进场", en: "Card Entrance" },
+    description: { zh: "卡片从下方滑入并淡入，点击可重播。", en: "A card slides up and fades in; click to replay." },
+    sample: { zh: "你好，动效", en: "Hello, motion" },
+    component: "card",
+    trigger: "enter",
+    contexts: ["showcase"],
+    tech: "CSS",
+    tags: ["卡片", "进场", "Entrance"],
+    previewComponent: "CardEntrance",
+    aiPrompt: {
+      zh: "用 React 和 CSS 制作卡片进场预览：圆角卡片从下方 20px 移到原位，透明度从 0 到 1，时长 500ms，ease-out。用按钮包住舞台，支持鼠标和键盘点击重播；自定义文字显示在卡片内，并提供减少动态的静态版本。",
+      en: "Create a card entrance preview with React and CSS: a rounded card rises 20px into place while fading from 0 to 1 over 500ms with ease-out. Wrap the stage in a button so mouse and keyboard can replay it, show custom text inside the card, and provide a static reduced-motion version.",
+    },
   },
   {
-    "id": "scroll",
-    "number": "007",
-    "name": "滾動揭示",
-    "nameEn": "Scroll Reveal",
-    "description": "捲動到舞台時，內容由下方淡入。",
-    "component": "卡片・群組",
-    "trigger": "捲動",
-    "contexts": [
-      "內容展示"
-    ],
-    "tech": "CSS",
-    "tags": [
-      "捲動",
-      "Scroll",
-      "Reveal"
-    ],
-    "previewComponent": "ScrollReveal",
-    "aiPrompt": "在 React 元件以 IntersectionObserver 監測舞台，進入可視範圍時顯示內容，離開時重設。用 CSS transition 讓內容由 translateY(24px) 與 opacity:0 移至原位，持續 600ms。effect 中斷開 observer，尊重 prefers-reduced-motion。"
+    id: "scroll",
+    number: "007",
+    name: { zh: "滚动显现", en: "Scroll Reveal" },
+    description: { zh: "滚动到舞台时，内容从下方淡入。", en: "Content fades up as the stage scrolls into view." },
+    sample: { zh: "滚动显现", en: "Scroll to reveal" },
+    component: "card",
+    trigger: "scroll",
+    contexts: ["showcase"],
+    tech: "CSS",
+    tags: ["滚动", "Scroll", "Reveal"],
+    previewComponent: "ScrollReveal",
+    aiPrompt: {
+      zh: "在 React 组件中用 IntersectionObserver 监测舞台，进入可视范围时显示内容，离开时重置。用 CSS transition 让内容从 translateY(24px)、opacity: 0 过渡到原位，时长 600ms。在 effect 清理时断开 observer，并尊重 prefers-reduced-motion。",
+      en: "In a React component, watch the stage with IntersectionObserver: reveal the content when it enters the viewport and reset when it leaves. Use a CSS transition from translateY(24px) and opacity: 0 to rest over 600ms. Disconnect the observer in the effect cleanup and respect prefers-reduced-motion.",
+    },
   },
   {
-    "id": "drag",
-    "number": "008",
-    "name": "拖曳跟隨",
-    "nameEn": "Drag Follow",
-    "description": "按住圓形標籤，在舞台內拖曳。",
-    "component": "游標",
-    "trigger": "拖曳",
-    "contexts": [
-      "互動",
-      "遊戲"
-    ],
-    "tech": "React",
-    "tags": [
-      "拖曳",
-      "Drag",
-      "Follow"
-    ],
-    "previewComponent": "DragFollow",
-    "aiPrompt": "以 React Pointer Events 做可拖曳標籤。pointerdown 時 setPointerCapture，記錄起始位置，pointermove 更新位移並限制在舞台邊界，pointerup 或 pointercancel 時釋放。支援滑鼠、觸控，以及方向鍵移動。舞台 touch-action:none，標籤文字可自訂。"
-  }
+    id: "drag",
+    number: "008",
+    name: { zh: "拖拽跟随", en: "Drag Follow" },
+    description: { zh: "按住圆形标签，在舞台内拖拽。", en: "Grab the pill and drag it around the stage." },
+    sample: { zh: "拖动我", en: "Drag me" },
+    component: "cursor",
+    trigger: "drag",
+    contexts: ["interactive", "game"],
+    tech: "React",
+    tags: ["拖拽", "Drag", "Follow"],
+    previewComponent: "DragFollow",
+    aiPrompt: {
+      zh: "用 React Pointer Events 制作可拖拽标签：pointerdown 时 setPointerCapture 并记录起点，pointermove 更新位移并限制在舞台边界内，pointerup 或 pointercancel 时释放。支持鼠标、触摸和方向键移动；舞台设置 touch-action: none，标签文字可自定义。",
+      en: "Build a draggable chip with React Pointer Events: on pointerdown call setPointerCapture and record the start point, update the offset on pointermove while clamping to the stage bounds, and release on pointerup or pointercancel. Support mouse, touch and arrow keys; set touch-action: none on the stage and allow custom chip text.",
+    },
+  },
 ];

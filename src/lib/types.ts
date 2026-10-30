@@ -1,20 +1,29 @@
-export const COMPONENTS = ["全部元件", "文字", "按鈕", "卡片・群組", "游標"];
-export const TRIGGERS = ["全部時機", "自動", "懸停", "進場", "捲動", "拖曳"];
-export const CONTEXTS = ["全部情境", "衝擊", "科技", "遊戲", "互動", "內容展示"];
-export const TECHS = ["全部技術", "CSS", "GSAP", "React"];
+export type Locale = "zh" | "en";
+export type Localized = Record<Locale, string>;
 
-export interface PreviewProps { text?: string }
+export const COMPONENTS = ["text", "button", "card", "cursor"] as const;
+export const TRIGGERS = ["auto", "hover", "enter", "scroll", "drag"] as const;
+export const CONTEXTS = ["impact", "tech", "game", "interactive", "showcase"] as const;
+export const TECHS = ["CSS", "GSAP", "React"] as const;
+
+export type ComponentKind = (typeof COMPONENTS)[number];
+export type TriggerKind = (typeof TRIGGERS)[number];
+export type ContextKind = (typeof CONTEXTS)[number];
+export type TechKind = (typeof TECHS)[number];
+
+export interface PreviewProps { text: string }
 export interface AnimationItem {
   id: string;
   number: string;
-  name: string;
-  nameEn: string;
-  description: string;
-  component: string;
-  trigger: string;
-  contexts: string[];
-  tech: string;
+  name: Localized;
+  description: Localized;
+  /** Default preview text when the visitor hasn't typed their own. */
+  sample: Localized;
+  component: ComponentKind;
+  trigger: TriggerKind;
+  contexts: ContextKind[];
+  tech: TechKind;
   tags: string[];
   previewComponent: string;
-  aiPrompt: string;
+  aiPrompt: Localized;
 }

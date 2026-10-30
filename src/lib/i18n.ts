@@ -1,0 +1,118 @@
+"use client";
+
+import { useLocale } from "./prefs";
+import type { ComponentKind, ContextKind, Locale, TriggerKind } from "./types";
+import type { ThemePref } from "./prefs";
+
+const zh = {
+  brand: "动效收藏",
+  language: "切换语言",
+  themes: { system: "跟随系统", light: "浅色", dark: "深色" } satisfies Record<ThemePref, string>,
+  themeLabel: (current: string) => `切换主题（当前：${current}）`,
+  submit: "投稿",
+  heroEyebrow: (n: number) => `已收录 ${n} 种动效 · 每个都能直接试玩`,
+  heroTitle: "收集好看的网页动效，",
+  heroAccent: "一键复制 AI 提示词。",
+  heroDesc:
+    "用「元件」和「时机」交叉筛选，例如「按钮 × 悬停」「卡片 × 进场」。每张卡片都是可以互动的预览，移动鼠标、滚动或拖拽试试看；点「复制 AI 提示词」就能拿到外观与实现方式的描述。",
+  filtersLabel: "搜索与筛选",
+  searchLabel: "搜索动效",
+  searchPlaceholder: "搜索名称、描述或标签，如：翻牌、按钮、Bounce",
+  previewTextLabel: "自定义预览文字",
+  previewTextPlaceholder: "自定义预览文字",
+  filterComponent: "元件",
+  filterTrigger: "时机",
+  filterContext: "情境",
+  filterTech: "技术",
+  all: "全部",
+  groupLabel: "分组方式",
+  groupByComponent: "按元件",
+  groupNone: "不分组",
+  clear: "清除筛选",
+  showing: (shown: number, total: number) => `显示 ${shown} / ${total} 种`,
+  countUnit: (n: number) => `${n} 种`,
+  copyPrompt: "复制 AI 提示词",
+  copied: "已复制",
+  copiedToast: "提示词已复制到剪贴板",
+  copyFailed: "复制失败，请检查浏览器的剪贴板权限",
+  replay: "重播",
+  empty: "没有符合条件的动效，换个关键词或清除筛选试试。",
+  backTop: "回到顶部",
+  components: { text: "文字", button: "按钮", card: "卡片", cursor: "光标" } satisfies Record<ComponentKind, string>,
+  triggers: { auto: "自动", hover: "悬停", enter: "进场", scroll: "滚动", drag: "拖拽" } satisfies Record<TriggerKind, string>,
+  contexts: { impact: "冲击", tech: "科技", game: "游戏", interactive: "互动", showcase: "内容展示" } satisfies Record<ContextKind, string>,
+  submitTitle: "投稿想收录的动效",
+  submitNote: "这是表单演示，内容不会提交或保存。",
+  submitName: "动效名称或描述",
+  submitLink: "参考链接（选填）",
+  submitAuthor: "你的称呼（选填）",
+  cancel: "取消",
+  send: "提交",
+  close: "关闭",
+  submitDone: "演示完成，内容未提交或保存",
+  sources: "参考来源",
+  footerNote: "名称与描述由原作者整理，预览动画为示意重制，仅供个人参考学习。",
+  replayCard: "重播卡片进场",
+  dragHint: "拖拽标签，也可以用方向键移动",
+};
+
+type Dict = typeof zh;
+
+const en: Dict = {
+  brand: "Motion Library",
+  language: "Switch language",
+  themes: { system: "System", light: "Light", dark: "Dark" },
+  themeLabel: (current) => `Change theme (current: ${current})`,
+  submit: "Submit",
+  heroEyebrow: (n) => `${n} effects so far · every one is playable`,
+  heroTitle: "A library of web motion,",
+  heroAccent: "with AI prompts to copy.",
+  heroDesc:
+    "Cross-filter by component and trigger, like “Button × Hover” or “Card × Entrance”. Every card is a live preview: move, scroll or drag to play with it, then hit “Copy AI prompt” to grab a description of the look and how to build it.",
+  filtersLabel: "Search and filters",
+  searchLabel: "Search effects",
+  searchPlaceholder: "Search names, descriptions or tags, e.g. flip, button, bounce",
+  previewTextLabel: "Custom preview text",
+  previewTextPlaceholder: "Custom preview text",
+  filterComponent: "Component",
+  filterTrigger: "Trigger",
+  filterContext: "Mood",
+  filterTech: "Tech",
+  all: "All",
+  groupLabel: "Grouping",
+  groupByComponent: "By component",
+  groupNone: "None",
+  clear: "Clear filters",
+  showing: (shown, total) => `Showing ${shown} of ${total}`,
+  countUnit: (n) => `${n}`,
+  copyPrompt: "Copy AI prompt",
+  copied: "Copied",
+  copiedToast: "Prompt copied to clipboard",
+  copyFailed: "Copy failed. Check your browser's clipboard permission.",
+  replay: "Replay",
+  empty: "No effects match. Try another keyword or clear the filters.",
+  backTop: "Back to top",
+  components: { text: "Text", button: "Button", card: "Card", cursor: "Cursor" },
+  triggers: { auto: "Auto", hover: "Hover", enter: "Entrance", scroll: "Scroll", drag: "Drag" },
+  contexts: { impact: "Impact", tech: "Tech", game: "Playful", interactive: "Interactive", showcase: "Showcase" },
+  submitTitle: "Suggest an effect",
+  submitNote: "This is a demo form. Nothing is sent or stored.",
+  submitName: "Effect name or description",
+  submitLink: "Reference link (optional)",
+  submitAuthor: "Your name (optional)",
+  cancel: "Cancel",
+  send: "Submit",
+  close: "Close",
+  submitDone: "Demo complete. Nothing was sent or stored.",
+  sources: "Sources",
+  footerNote: "Names and descriptions were compiled by the original authors. Previews are re-implementations for personal reference and learning.",
+  replayCard: "Replay card entrance",
+  dragHint: "Drag the chip, or move it with the arrow keys",
+};
+
+export const dict: Record<Locale, Dict> = { zh, en };
+
+export function useI18n() {
+  const locale = useLocale();
+  return { locale, t: dict[locale] };
+}
