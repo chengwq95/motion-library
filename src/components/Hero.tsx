@@ -1,15 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { ArrowDown, Shuffle, Sparkles } from "lucide-react";
 import Showcase from "@/components/Showcase";
+import { useRandomEffect } from "@/hooks/useRandomEffect";
 import { animations } from "@/lib/animations";
 import { useI18n } from "@/lib/i18n";
 import { COMPONENTS } from "@/lib/types";
 
 export default function Hero() {
   const { t } = useI18n();
-  const router = useRouter();
+  const openRandom = useRandomEffect();
   const stats = [
     { value: String(animations.length), label: t.statEffects },
     { value: String(COMPONENTS.length), label: t.statCategories },
@@ -53,7 +53,7 @@ export default function Hero() {
           </button>
           <button
             type="button"
-            onClick={() => router.push(`/effects/${animations[Math.floor(Math.random() * animations.length)].id}`)}
+            onClick={openRandom}
             className="inline-flex h-12 items-center gap-2 rounded-full border border-line bg-card/60 px-6 text-sm font-medium backdrop-blur transition hover:-translate-y-0.5 hover:border-fg/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             <Shuffle className="h-4 w-4" />

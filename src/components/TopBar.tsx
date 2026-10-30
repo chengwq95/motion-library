@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Shuffle, Sun } from "lucide-react";
+import { useRandomEffect } from "@/hooks/useRandomEffect";
+import { useShortcuts } from "@/hooks/useShortcut";
 import { useI18n } from "@/lib/i18n";
 import { setLocale, setThemePref, useThemePref, type ThemePref } from "@/lib/prefs";
 import type { Locale } from "@/lib/types";
@@ -25,6 +27,8 @@ export default function TopBar() {
   const themePref = useThemePref();
   const ThemeIcon = THEME_ICON[themePref];
   const themeLabel = t.themeLabel(t.themes[themePref]);
+  const openRandom = useRandomEffect();
+  useShortcuts({ r: openRandom });
 
   return (
     <div className="sticky top-0 z-40 border-b border-line/60 bg-page/70 backdrop-blur-xl backdrop-saturate-150">
@@ -36,6 +40,16 @@ export default function TopBar() {
           </span>
           <span>{t.brand}</span>
         </Link>
+
+        <button
+          type="button"
+          onClick={openRandom}
+          aria-label={t.ctaRandom}
+          title={`${t.ctaRandom} (R)`}
+          className="group/rand grid place-items-center w-8 h-8 rounded-full border border-line bg-card text-muted transition-colors hover:border-accent/50 hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
+        >
+          <Shuffle className="h-4 w-4 transition-transform duration-300 group-hover/rand:rotate-180" />
+        </button>
 
         <div role="group" aria-label={t.language} className="flex rounded-full border border-line bg-card p-0.5 text-xs font-medium">
           {LOCALES.map((l) => (

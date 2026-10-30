@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check, Copy } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Copy, Shuffle } from "lucide-react";
 import AnimationCard from "@/components/AnimationCard";
 import BackToTop from "@/components/BackToTop";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -10,6 +11,8 @@ import TagList from "@/components/TagList";
 import TopBar from "@/components/TopBar";
 import { useCopy } from "@/hooks/useCopy";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useRandomEffect } from "@/hooks/useRandomEffect";
+import { useShortcuts } from "@/hooks/useShortcut";
 import { animations } from "@/lib/animations";
 import { useI18n } from "@/lib/i18n";
 import type { AnimationItem } from "@/lib/types";
@@ -50,6 +53,9 @@ export default function EffectDetail({ id, source }: { id: string; source?: stri
   const prev = animations[(index - 1 + animations.length) % animations.length];
   const next = animations[(index + 1) % animations.length];
   useDocumentTitle(`${item.name[locale]} · ${t.brand}`);
+  const router = useRouter();
+  const openRandom = useRandomEffect();
+  useShortcuts({ ArrowLeft: () => router.push(`/effects/${prev.id}`), ArrowRight: () => router.push(`/effects/${next.id}`) });
 
   // Snippet effects show their own HTML + CSS; React effects show the component file.
   const code = item.snippet
@@ -61,10 +67,24 @@ export default function EffectDetail({ id, source }: { id: string; source?: stri
       <TopBar />
 
       <main className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-8 pb-24">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-fg">
-          <ArrowLeft className="w-4 h-4" />
-          {t.backToAll}
-        </Link>
+        {/* Quick navigation so you can keep browsing without going back to the list. */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Link href="/" className="mr-auto inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-fg">
+            <ArrowLeft className="w-4 h-4" />
+            {t.backToAll}
+          </Link>
+          <span className="hidden font-mono text-[11px] text-muted md:inline">{t.shortcutsHint}</span>
+          <Link href={`/effects/${prev.id}`} aria-label={`${t.previous}: ${prev.name[locale]}`} title={`${t.previous} (←)`} className="grid h-9 w-9 place-items-center rounded-full border border-line bg-card text-muted transition-colors hover:border-fg/30 hover:text-fg focus-visible:outline-2 focus-visible:outline-accent">
+            <ChevronLeft className="h-4 w-4" />
+          </Link>
+          <Link href={`/effects/${next.id}`} aria-label={`${t.next}: ${next.name[locale]}`} title={`${t.next} (→)`} className="grid h-9 w-9 place-items-center rounded-full border border-line bg-card text-muted transition-colors hover:border-fg/30 hover:text-fg focus-visible:outline-2 focus-visible:outline-accent">
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+          <button type="button" onClick={openRandom} className="inline-flex h-9 items-center gap-1.5 rounded-full bg-fg px-4 text-sm font-medium text-page transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+            <Shuffle className="h-4 w-4" />
+            {t.ctaRandom}
+          </button>
+        </div>
 
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
           <PreviewStage item={item} text={item.sample[locale]} className="h-[280px] overflow-hidden rounded-3xl border border-line sm:h-[380px]" />

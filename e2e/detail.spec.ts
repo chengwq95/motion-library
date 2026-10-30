@@ -62,3 +62,24 @@ test("share images, sitemap and metadata are served", async ({ page, request }) 
   await expect(page).toHaveTitle("视差倾斜 · 动效收藏");
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /\/effects\/tilt\/opengraph-image/);
 });
+
+test("surprise me and keyboard shortcuts work from a detail page", async ({ page }) => {
+  const [first, second] = animations;
+  await page.goto(`/effects/${first.id}`);
+  // Wait for hydration: the live preview only renders on the client.
+  await expect(page.locator("main [data-paused], main .group\\/stage").first().locator("> *")).toHaveCount(2);
+
+  await page.keyboard.press("ArrowRight");
+  await expect(page).toHaveURL(new RegExp(`/effects/${second.id}$`));
+  await page.keyboard.press("ArrowLeft");
+  await expect(page).toHaveURL(new RegExp(`/effects/${first.id}$`));
+
+  // The top bar button is on every page and never picks the current effect.
+  await page.getByRole("banner").or(page.locator("nav").first()).getByRole("button", { name: "随机来一个" }).first().click();
+  await expect(page).not.toHaveURL(new RegExp(`/effects/${first.id}$`));
+  await expect(page).toHaveURL(/\/effects\/[\w-]+$/);
+
+  const url = page.url();
+  await page.keyboard.press("r");
+  await expect(page).not.toHaveURL(url);
+});
