@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
     "build:html": "next build && node scripts/build-standalone.mjs",
-    "capture": "node scripts/capture-previews.mjs"
+    "capture": "node scripts/capture-previews.mjs",
+    "build:pages": "node scripts/build-pages.mjs"
   },
   "dependencies": {
     "geist": "1.9.0",

@@ -1,3 +1,5 @@
+export const dynamic = "force-static";
+
 import { animations } from "@/lib/animations";
 import { OG_SIZE, renderOgImage } from "@/lib/og";
 

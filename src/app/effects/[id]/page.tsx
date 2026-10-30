@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import EffectDetail from "@/components/EffectDetail";
 import { animations } from "@/lib/animations";
+import { SITE_URL } from "@/lib/site";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!item) return {};
   const title = `${item.name.zh} · 动效收藏`;
   const description = item.description.zh;
-  return { title, description, alternates: { canonical: `/effects/${item.id}` }, openGraph: { title, description, type: "article" } };
+  return { title, description, alternates: { canonical: `${SITE_URL}/effects/${item.id}/` }, openGraph: { title, description, type: "article" } };
 }
 
 export default async function EffectPage({ params }: Props) {

@@ -7,7 +7,7 @@ import { animations } from "@/lib/animations";
 export function useRandomEffect() {
   const router = useRouter();
   return () => {
-    const current = (window.location.hash || window.location.pathname).split("/effects/")[1];
+    const current = (window.location.hash || window.location.pathname).split("/effects/")[1]?.split(/[/?#]/)[0];
     const pool = animations.filter((a) => a.id !== current);
     router.push(`/effects/${pool[Math.floor(Math.random() * pool.length)].id}`);
   };
