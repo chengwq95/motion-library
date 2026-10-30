@@ -66,7 +66,8 @@ function Segmented<T extends string>({ label, value, onChange, options }: { labe
   );
 }
 
-const WIDTHS = { phone: "360px", tablet: "560px", full: "100%" } as const;
+// Narrower than the preview column on desktop, so every option visibly changes the frame.
+const WIDTHS = { phone: "320px", tablet: "480px", full: "100%" } as const;
 
 export default function EffectDetail({ id, source }: { id: string; source?: string }) {
   const { t, locale } = useI18n();
@@ -112,16 +113,21 @@ export default function EffectDetail({ id, source }: { id: string; source?: stri
 
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
           <div>
-            <div className="flex h-[280px] justify-center overflow-hidden rounded-3xl border border-line bg-stage/50 sm:h-[380px]">
+            {/* Narrow widths show the preview as a framed device on a dotted backdrop. */}
+            <div className={`relative flex h-[280px] justify-center overflow-hidden rounded-3xl border border-line sm:h-[380px] ${
+              width === "full" ? "bg-stage" : "bg-page bg-[radial-gradient(var(--line)_1px,transparent_1px)] [background-size:14px_14px] py-4"}`}>
               <PreviewStage
                 item={item}
                 text={item.sample[locale]}
                 demo={demo}
                 bg={bg}
                 speed={speed}
-                className="h-full w-full overflow-hidden transition-[max-width] duration-500"
+                className={`h-full w-full overflow-hidden transition-[max-width,border-radius] duration-500 ${width === "full" ? "" : "rounded-2xl border border-line shadow-xl shadow-black/10"}`}
                 style={{ maxWidth: WIDTHS[width] }}
               />
+              {width !== "full" && (
+                <span className="pointer-events-none absolute right-3 top-3 rounded-full border border-line bg-card px-2 py-0.5 font-mono text-[10px] text-muted">{WIDTHS[width]}</span>
+              )}
             </div>
             {/* Preview tools: auto demo, background, speed and width. */}
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">

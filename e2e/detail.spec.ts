@@ -98,7 +98,7 @@ test("auto demo plays hover effects and the preview tools work", async ({ page }
   await page.getByRole("button", { name: "浅色" }).click();
   await expect(stage).toHaveAttribute("data-stage-bg", "light");
   await page.getByRole("button", { name: "手机" }).click();
-  await expect(stage).toHaveCSS("max-width", "360px");
+  await expect(stage).toHaveCSS("max-width", "320px");
 });
 
 test("code tabs show and copy each format", async ({ page, context }) => {
