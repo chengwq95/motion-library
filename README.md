@@ -6,7 +6,7 @@ Built with Next.js, React, TypeScript and Tailwind CSS. The interface is availab
 
 ## Preview
 
-**Dark mode · Simplified Chinese**
+**Dark mode · English**
 
 ![Motion Library home page in dark mode](docs/images/overview-dark.png)
 
