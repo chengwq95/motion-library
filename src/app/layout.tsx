@@ -3,13 +3,13 @@ import AppToaster from "@/components/AppToaster";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-const description = "搜索、筛选和试玩网页动效，一键复制 AI 提示词。Browse, filter and play with web animations, and copy AI prompts.";
+const description = "搜索、筛选和试玩网页动效，一键复制 AI 提示词。";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Motion Library 动效收藏",
+  title: "动效收藏",
   description,
-  openGraph: { siteName: "Motion Library", type: "website", locale: "zh_CN", alternateLocale: ["en_US"], description },
+  openGraph: { siteName: "动效收藏", type: "website", locale: "zh_CN", description },
   twitter: { card: "summary_large_image" },
 };
 

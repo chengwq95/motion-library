@@ -34,8 +34,7 @@ export default function TopBar() {
       <nav className="max-w-[1200px] mx-auto px-4 sm:px-6 h-14 flex items-center gap-2 sm:gap-3">
         <Link href="/" className="mr-auto flex items-center gap-2.5 font-bold tracking-tight">
           <Logo className="w-7 h-7 rounded-lg ring-1 ring-line" />
-          <span>Motion Library</span>
-          <span className="hidden sm:inline text-muted font-normal">{locale === "zh" ? "动效收藏" : ""}</span>
+          <span>{t.brand}</span>
         </Link>
 
         <div role="group" aria-label={t.language} className="flex rounded-full border border-line bg-card p-0.5 text-xs font-medium">

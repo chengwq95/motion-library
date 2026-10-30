@@ -6,10 +6,10 @@ import AnimationCard from "@/components/AnimationCard";
 import BackToTop from "@/components/BackToTop";
 import FavoriteButton from "@/components/FavoriteButton";
 import PreviewStage from "@/components/PreviewStage";
-import SiteFooter from "@/components/SiteFooter";
 import TagList from "@/components/TagList";
 import TopBar from "@/components/TopBar";
 import { useCopy } from "@/hooks/useCopy";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { animations } from "@/lib/animations";
 import { useI18n } from "@/lib/i18n";
 import type { AnimationItem } from "@/lib/types";
@@ -43,13 +43,18 @@ function CopyButton({ text, label, message }: { text: string; label: string; mes
   );
 }
 
-export default function EffectDetail({ id, source }: { id: string; source: string }) {
+export default function EffectDetail({ id, source }: { id: string; source?: string }) {
   const { t, locale } = useI18n();
   const index = animations.findIndex((a) => a.id === id);
   const item = animations[index];
   const prev = animations[(index - 1 + animations.length) % animations.length];
   const next = animations[(index + 1) % animations.length];
-  const otherLocale = locale === "zh" ? "en" : "zh";
+  useDocumentTitle(`${item.name[locale]} · ${t.brand}`);
+
+  // Snippet effects show their own HTML + CSS; React effects show the component file.
+  const code = item.snippet
+    ? `<!-- HTML -->\n${item.snippet.html(item.sample[locale], locale)}\n\n<style>\n${item.snippet.css}\n</style>`
+    : source ?? "";
 
   return (
     <div className="min-h-screen">
@@ -69,7 +74,6 @@ export default function EffectDetail({ id, source }: { id: string; source: strin
               <h1 className="flex-1 text-3xl font-black tracking-tight sm:text-4xl">{item.name[locale]}</h1>
               <FavoriteButton id={item.id} label={item.name[locale]} className="mt-1 w-10 h-10 border border-line" />
             </div>
-            <p lang={otherLocale === "zh" ? "zh-CN" : "en"} className="mt-1 text-muted">{item.name[otherLocale]}</p>
             <p className="mt-4 text-lg leading-relaxed">{item.description[locale]}</p>
             <TagList item={item} className="mt-4 text-xs" />
 
@@ -78,7 +82,7 @@ export default function EffectDetail({ id, source }: { id: string; source: strin
                 <h2 className="font-semibold">{t.promptTitle}</h2>
                 <CopyButton text={item.aiPrompt[locale]} label={t.copyPrompt} message={t.copiedToast} />
               </div>
-              <p className="text-sm leading-relaxed text-muted">{item.aiPrompt[locale]}</p>
+              <p className="max-h-72 overflow-auto whitespace-pre-wrap break-words text-sm leading-relaxed text-muted">{item.aiPrompt[locale]}</p>
             </section>
           </div>
         </div>
@@ -87,12 +91,12 @@ export default function EffectDetail({ id, source }: { id: string; source: strin
           <div className="flex flex-wrap items-center gap-3 border-b border-line px-5 py-3">
             <div className="mr-auto">
               <h2 className="font-semibold">{t.sourceTitle}</h2>
-              <p className="text-xs text-muted">{t.sourceNote}</p>
+              <p className="text-xs text-muted">{item.snippet ? t.sourceSnippetNote : t.sourceNote}</p>
             </div>
-            <span className="font-mono text-xs text-muted">{item.previewComponent}.tsx</span>
-            <CopyButton text={source} label={t.copySource} message={t.sourceCopied} />
+            <span className="font-mono text-xs text-muted">{item.snippet ? "HTML + CSS" : `${item.previewComponent}.tsx`}</span>
+            <CopyButton text={code} label={t.copySource} message={t.sourceCopied} />
           </div>
-          <pre className="max-h-[480px] overflow-auto bg-stage p-5 font-mono text-[13px] leading-relaxed"><code>{source}</code></pre>
+          <pre className="max-h-[480px] overflow-auto bg-stage p-5 font-mono text-[13px] leading-relaxed"><code>{code}</code></pre>
         </section>
 
         <nav className="mt-10 grid gap-3 sm:grid-cols-2">
@@ -116,7 +120,6 @@ export default function EffectDetail({ id, source }: { id: string; source: strin
         </section>
       </main>
 
-      <SiteFooter />
       <BackToTop />
     </div>
   );

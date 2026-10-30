@@ -64,4 +64,4 @@ const html = `<!doctype html>
 
 await mkdir(path.dirname(outFile), { recursive: true });
 await writeFile(outFile, html);
-console.log(`Wrote ${path.relative(root, outFile)} (${(html.length / 1024).toFixed(0)} KB, ${entries.length} effects)`);
+console.log(`Wrote ${path.relative(root, outFile)} (${(html.length / 1024).toFixed(0)} KB, ${entries.length} React preview sources)`);

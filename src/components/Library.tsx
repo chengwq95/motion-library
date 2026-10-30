@@ -24,7 +24,12 @@ function searchText(a: AnimationItem) {
 }
 const SEARCH_INDEX = new Map(animations.map((a) => [a.id, searchText(a)]));
 
+// With hundreds of effects, show a few per group (or a page at a time) and let people ask for more.
+const GROUP_PREVIEW = 6;
+const PAGE_SIZE = 36;
+
 const inputClass = "w-full rounded-xl border border-line bg-page py-2.5 pl-10 pr-10 text-sm outline-none transition-colors placeholder:text-muted focus:border-accent";
+const moreClass = "mx-auto mt-5 flex rounded-full border border-line bg-card px-5 py-2 text-sm font-medium transition-colors hover:border-fg/30 hover:bg-fg/5 focus-visible:outline-2 focus-visible:outline-accent";
 const pillClass = "rounded-full px-3 py-1 text-muted transition-colors hover:text-fg aria-pressed:bg-fg aria-pressed:text-page focus-visible:outline-2 focus-visible:outline-accent";
 
 export default function Library({ initialQuery }: { initialQuery: string }) {
@@ -37,6 +42,9 @@ export default function Library({ initialQuery }: { initialQuery: string }) {
   const [grouped, setGrouped] = useState(initial.grouped);
   const [favoritesOnly, setFavoritesOnly] = useState(initial.favoritesOnly);
   const searchRef = useRef<HTMLInputElement>(null);
+  const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set());
+  // The page size resets whenever the results change: it is tied to the query it was grown for.
+  const [more, setMore] = useState({ query: "", limit: PAGE_SIZE });
 
   // Mirror the state into the URL (debounced, as browsers rate-limit replaceState).
   useEffect(() => {
@@ -81,6 +89,16 @@ export default function Library({ initialQuery }: { initialQuery: string }) {
       label: value === ALL ? t.all : label(value),
       count: searched.filter((a) => matchesFilters(a, { ...filters, [key]: value })).length,
     }));
+
+  const resultsKey = toQuery({ search, previewText: "", filters, grouped, favoritesOnly });
+  const limit = more.query === resultsKey ? more.limit : PAGE_SIZE;
+  const toggleGroup = (kind: string) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(kind)) next.delete(kind);
+      else next.add(kind);
+      return next;
+    });
 
   const setFilter = (key: keyof Filters) => (value: string) => setFilters((f) => ({ ...f, [key]: value }));
 
@@ -169,19 +187,34 @@ export default function Library({ initialQuery }: { initialQuery: string }) {
       </section>
 
       <main className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-10 pb-24">
-        {filtered.length > 0 ? groups.map(([kind, items]) => (
-          <section key={kind ?? ALL} className="mb-12 last:mb-0">
-            {kind && (
-              <h2 className="mb-4 flex items-baseline gap-2 text-xl font-bold">
-                {t.components[kind]}
-                <span className="text-sm font-normal text-muted">{t.countUnit(items.length)}</span>
-              </h2>
-            )}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-              {items.map((item) => <AnimationCard key={item.id} item={item} previewText={previewText} />)}
-            </div>
-          </section>
-        )) : (
+        {filtered.length > 0 ? groups.map(([kind, items]) => {
+          // A group is shown in full when expanded or when it is the only one left.
+          const full = !kind || expanded.has(kind) || groups.length === 1;
+          const shown = kind ? (full ? items : items.slice(0, GROUP_PREVIEW)) : items.slice(0, limit);
+          return (
+            <section key={kind ?? ALL} className="mb-12 last:mb-0">
+              {kind && (
+                <h2 className="mb-4 flex items-baseline gap-2 text-xl font-bold">
+                  {t.components[kind]}
+                  <span className="text-sm font-normal text-muted">{t.countUnit(items.length)}</span>
+                </h2>
+              )}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+                {shown.map((item) => <AnimationCard key={item.id} item={item} previewText={previewText} />)}
+              </div>
+              {kind && items.length > GROUP_PREVIEW && groups.length > 1 && (
+                <button type="button" onClick={() => toggleGroup(kind)} className={moreClass}>
+                  {expanded.has(kind) ? t.showLess : t.showAll(items.length)}
+                </button>
+              )}
+              {!kind && items.length > limit && (
+                <button type="button" onClick={() => setMore({ query: resultsKey, limit: limit + PAGE_SIZE })} className={moreClass}>
+                  {t.loadMore(items.length - limit)}
+                </button>
+              )}
+            </section>
+          );
+        }) : (
           <div className="rounded-2xl border border-dashed border-line px-6 py-20 text-center">
             <p className="text-muted">{favoritesOnly && favorites.length === 0 ? t.favoritesEmpty : t.empty}</p>
             <button type="button" onClick={clearAll} className="mt-4 rounded-full border border-line px-4 py-1.5 text-sm hover:bg-fg/5">{t.clear}</button>

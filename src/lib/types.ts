@@ -1,10 +1,10 @@
 export type Locale = "zh" | "en";
 export type Localized = Record<Locale, string>;
 
-export const COMPONENTS = ["text", "button", "card", "cursor"] as const;
-export const TRIGGERS = ["auto", "hover", "click", "enter", "scroll", "drag"] as const;
-export const CONTEXTS = ["impact", "tech", "game", "interactive", "showcase"] as const;
-export const TECHS = ["CSS", "GSAP", "React"] as const;
+export const COMPONENTS = ["text", "button", "card", "nav", "control", "loader", "background", "icon", "data", "cursor"] as const;
+export const TRIGGERS = ["auto", "hover", "click", "focus", "enter", "scroll", "drag"] as const;
+export const CONTEXTS = ["impact", "tech", "game", "interactive", "showcase", "elegant", "feedback"] as const;
+export const TECHS = ["CSS", "SVG", "GSAP", "React"] as const;
 
 export type ComponentKind = (typeof COMPONENTS)[number];
 export type TriggerKind = (typeof TRIGGERS)[number];
@@ -27,6 +27,15 @@ export interface AnimationItem {
   contexts: ContextKind[];
   tech: TechKind;
   tags: string[];
-  previewComponent: string;
+  /** React preview in src/components/previews (hand-written effects)… */
+  previewComponent?: string;
+  /** …or an HTML + CSS snippet (see src/lib/effects). */
+  snippet?: Snippet;
   aiPrompt: Localized;
+}
+
+/** A self-contained HTML + CSS effect; class names and keyframes are already scoped to the effect. */
+export interface Snippet {
+  css: string;
+  html: (text: string, locale: Locale) => string;
 }

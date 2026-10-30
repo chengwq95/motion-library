@@ -2,9 +2,9 @@
 
 import { useEffect, useState, type RefObject } from "react";
 
-/** Whether the element is on screen (with a small margin so animations resume just before it appears). */
-export function useInView(ref: RefObject<Element | null>, rootMargin = "100px") {
-  const [inView, setInView] = useState(true);
+/** Whether the element is on screen, with a margin so content is ready just before it scrolls in. Starts false. */
+export function useInView(ref: RefObject<Element | null>, rootMargin = "200px") {
+  const [inView, setInView] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;

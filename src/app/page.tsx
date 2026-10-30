@@ -2,8 +2,8 @@
 
 import BackToTop from "@/components/BackToTop";
 import Library from "@/components/Library";
-import SiteFooter from "@/components/SiteFooter";
 import TopBar from "@/components/TopBar";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useInitialQuery } from "@/hooks/useInitialQuery";
 import { animations } from "@/lib/animations";
 import { useI18n } from "@/lib/i18n";
@@ -11,6 +11,7 @@ import { useI18n } from "@/lib/i18n";
 export default function Home() {
   const { t } = useI18n();
   const initialQuery = useInitialQuery();
+  useDocumentTitle(t.brand);
 
   return (
     <div className="min-h-screen">
@@ -35,7 +36,6 @@ export default function Home() {
       {/* Remounts once after hydration so filters from a shared link take effect. */}
       <Library key={initialQuery || "ssr"} initialQuery={initialQuery ?? ""} />
 
-      <SiteFooter />
       <BackToTop />
     </div>
   );

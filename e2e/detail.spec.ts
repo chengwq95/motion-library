@@ -19,6 +19,23 @@ test("copies the preview source", async ({ page, context }) => {
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("export default function Marquee");
 });
 
+test("snippet effects show their HTML and CSS", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/effects/like-burst");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("点赞爆开");
+  await expect(page.getByText("HTML + CSS")).toBeVisible();
+  await expect(page.locator("pre code")).toContainText(".fx-like-burst");
+  await page.getByRole("button", { name: "复制 AI 提示词" }).first().click();
+  const prompt = await page.evaluate(() => navigator.clipboard.readText());
+  expect(prompt).toContain("点赞爆开");
+  expect(prompt).toContain("@keyframes fx-like-burst");
+
+  // The preview reacts to clicks (checkbox toggle).
+  const heart = page.locator(".fx-like-burst").first();
+  await heart.click();
+  await expect(heart.locator("input")).toBeChecked();
+});
+
 test("previous and next wrap around the list", async ({ page }) => {
   const first = animations[0];
   const last = animations[animations.length - 1];
@@ -42,6 +59,6 @@ test("share images, sitemap and metadata are served", async ({ page, request }) 
   for (const a of animations) expect(sitemap).toContain(`/effects/${a.id}`);
 
   await page.goto("/effects/tilt");
-  await expect(page).toHaveTitle("视差倾斜 Parallax Tilt · Motion Library");
+  await expect(page).toHaveTitle("视差倾斜 · 动效收藏");
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /\/effects\/tilt\/opengraph-image/);
 });

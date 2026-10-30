@@ -12,7 +12,6 @@ import type { AnimationItem } from "@/lib/types";
 export default function AnimationCard({ item, previewText }: { item: AnimationItem; previewText: string }) {
   const { t, locale } = useI18n();
   const { copied, copy } = useCopy();
-  const otherLocale = locale === "zh" ? "en" : "zh";
   const href = `/effects/${item.id}`;
 
   return (
@@ -23,7 +22,6 @@ export default function AnimationCard({ item, previewText }: { item: AnimationIt
         <div className="flex items-start gap-2">
           <h3 className="flex-1 font-semibold leading-snug">
             <Link href={href} className="transition-colors hover:text-accent">{item.name[locale]}</Link>
-            <span lang={otherLocale === "zh" ? "zh-CN" : "en"} className="ml-2 text-sm font-normal text-muted">{item.name[otherLocale]}</span>
           </h3>
           <FavoriteButton id={item.id} label={item.name[locale]} className="-mr-1.5 -mt-1" />
         </div>

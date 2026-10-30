@@ -1,6 +1,7 @@
+import { snippetEffects } from "./effects";
 import type { AnimationItem } from "./types";
 
-export const animations: AnimationItem[] = [
+const componentEffects: AnimationItem[] = [
   {
     id: "lightning",
     name: { zh: "闪电砸落", en: "Lightning Strike" },
@@ -242,3 +243,5 @@ export const animations: AnimationItem[] = [
     },
   },
 ];
+
+export const animations: AnimationItem[] = [...componentEffects, ...snippetEffects];
