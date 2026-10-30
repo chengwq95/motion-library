@@ -140,6 +140,27 @@ body::before {
   opacity: 1;
 }
 
+/* Preview background override on the detail page, independent of the page theme. */
+[data-stage-bg="light"] {
+  --page: #fafaf8; --fg: #0f0f12; --muted: #6e6e76; --card: #ffffff; --line: #e8e7e3; --stage: #f3f2ef;
+  --accent: #6d5efc; --accent-fg: #ffffff; --accent-2: #e8559b; --accent-3: #f0a03a;
+  color: var(--fg);
+}
+[data-stage-bg="dark"] {
+  --page: #08080a; --fg: #f4f4f5; --muted: #8b8b94; --card: #111114; --line: #222228; --stage: #0c0c0f;
+  --accent: #9d8cff; --accent-fg: #0b0b0d; --accent-2: #f472b6; --accent-3: #fbbf24;
+  color: var(--fg);
+}
+[data-stage-bg="checker"] {
+  background: repeating-conic-gradient(var(--line) 0 25%, var(--stage) 0 50%) 0 0 / 22px 22px !important;
+}
+
+/* The "hover me" badge on interactive previews, with a gentle pulse. */
+@keyframes ml-hint {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
 /* Seamless horizontal loop for the hero showcase. */
 @keyframes ml-showcase {
   to { transform: translateX(-50%); }

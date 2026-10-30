@@ -98,7 +98,38 @@ export function toggleFavorite(id: string) {
   notify();
 }
 
+const NO_RECENT: string[] = [];
+let recentRaw: string | null = null;
+let recent = NO_RECENT;
+
+function getRecent() {
+  const raw = read("recent");
+  if (raw !== recentRaw) {
+    recentRaw = raw;
+    try {
+      const parsed: unknown = JSON.parse(raw ?? "[]");
+      recent = Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : NO_RECENT;
+    } catch {
+      recent = NO_RECENT;
+    }
+  }
+  return recent;
+}
+
+/** Remembers a viewed effect (most recent first, up to 20). */
+export function addRecent(id: string) {
+  const next = [id, ...getRecent().filter((r) => r !== id)].slice(0, 20);
+  write("recent", JSON.stringify(next));
+  notify();
+}
+
+export function clearRecent() {
+  write("recent", null);
+  notify();
+}
+
 export const useThemePref = () => useSyncExternalStore(subscribe, getThemePref, () => "system" as const);
 export const useTheme = () => useSyncExternalStore(subscribe, getTheme, () => "dark" as const);
 export const useLocale = () => useSyncExternalStore(subscribe, getLocale, () => "zh" as const);
 export const useFavorites = () => useSyncExternalStore(subscribe, getFavorites, () => NO_FAVORITES);
+export const useRecent = () => useSyncExternalStore(subscribe, getRecent, () => NO_RECENT);

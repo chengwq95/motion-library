@@ -1,12 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Copy, Shuffle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Copy, Pause, Play, Shuffle } from "lucide-react";
 import AnimationCard from "@/components/AnimationCard";
 import BackToTop from "@/components/BackToTop";
 import FavoriteButton from "@/components/FavoriteButton";
-import PreviewStage from "@/components/PreviewStage";
+import CodePanel from "@/components/CodePanel";
+import PreviewStage, { isInteractive, type StageBg } from "@/components/PreviewStage";
 import TagList from "@/components/TagList";
 import TopBar from "@/components/TopBar";
 import { useCopy } from "@/hooks/useCopy";
@@ -14,6 +16,8 @@ import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useRandomEffect } from "@/hooks/useRandomEffect";
 import { useShortcuts } from "@/hooks/useShortcut";
 import { animations } from "@/lib/animations";
+import { toReact } from "@/lib/exporters";
+import { addRecent } from "@/lib/prefs";
 import { useI18n } from "@/lib/i18n";
 import type { AnimationItem } from "@/lib/types";
 
@@ -29,22 +33,40 @@ function relatedTo(item: AnimationItem) {
     .map(({ a }) => a);
 }
 
-function CopyButton({ text, label, message }: { text: string; label: string; message: string }) {
+function QuickCopy({ text, label, message, primary }: { text: string | (() => string); label: string; message: string; primary?: boolean }) {
   const { t } = useI18n();
   const { copied, copy } = useCopy();
   return (
     <button
       type="button"
-      onClick={() => copy(text, message)}
-      className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-accent ${
-        copied ? "border-accent bg-accent text-accent-fg" : "border-line hover:border-fg hover:bg-fg hover:text-page"
+      onClick={() => copy(typeof text === "function" ? text() : text, message)}
+      className={`flex h-11 items-center gap-2 rounded-full border px-5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+        copied ? "border-accent bg-accent text-accent-fg" : primary ? "border-fg bg-fg text-page hover:-translate-y-0.5" : "border-line hover:border-fg/40"
       }`}
     >
-      {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
       {copied ? t.copied : label}
     </button>
   );
 }
+
+function Segmented<T extends string>({ label, value, onChange, options }: { label: string; value: T; onChange: (v: T) => void; options: { value: T; label: string }[] }) {
+  return (
+    <div role="group" aria-label={label} className="flex items-center gap-1.5">
+      <span className="text-muted">{label}</span>
+      <div className="flex rounded-full border border-line p-0.5">
+        {options.map((o) => (
+          <button key={o.value} type="button" aria-pressed={value === o.value} onClick={() => onChange(o.value)}
+            className="rounded-full px-2.5 py-1 text-muted transition-colors hover:text-fg aria-pressed:bg-fg aria-pressed:text-page">
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const WIDTHS = { phone: "360px", tablet: "560px", full: "100%" } as const;
 
 export default function EffectDetail({ id, source }: { id: string; source?: string }) {
   const { t, locale } = useI18n();
@@ -56,11 +78,13 @@ export default function EffectDetail({ id, source }: { id: string; source?: stri
   const router = useRouter();
   const openRandom = useRandomEffect();
   useShortcuts({ ArrowLeft: () => router.push(`/effects/${prev.id}`), ArrowRight: () => router.push(`/effects/${next.id}`) });
+  useEffect(() => addRecent(item.id), [item.id]);
 
-  // Snippet effects show their own HTML + CSS; React effects show the component file.
-  const code = item.snippet
-    ? `<!-- HTML -->\n${item.snippet.html(item.sample[locale], locale)}\n\n<style>\n${item.snippet.css}\n</style>`
-    : source ?? "";
+  // Interactive effects demo themselves until you turn it off (or take over with the pointer).
+  const [demo, setDemo] = useState(isInteractive(item));
+  const [bg, setBg] = useState<StageBg>("theme");
+  const [speed, setSpeed] = useState(1);
+  const [width, setWidth] = useState<keyof typeof WIDTHS>("full");
 
   return (
     <div className="min-h-screen">
@@ -87,7 +111,32 @@ export default function EffectDetail({ id, source }: { id: string; source?: stri
         </div>
 
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
-          <PreviewStage item={item} text={item.sample[locale]} className="h-[280px] overflow-hidden rounded-3xl border border-line sm:h-[380px]" />
+          <div>
+            <div className="flex h-[280px] justify-center overflow-hidden rounded-3xl border border-line bg-stage/50 sm:h-[380px]">
+              <PreviewStage
+                item={item}
+                text={item.sample[locale]}
+                demo={demo}
+                bg={bg}
+                speed={speed}
+                className="h-full w-full overflow-hidden transition-[max-width] duration-500"
+                style={{ maxWidth: WIDTHS[width] }}
+              />
+            </div>
+            {/* Preview tools: auto demo, background, speed and width. */}
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+              {isInteractive(item) && (
+                <button type="button" aria-pressed={demo} onClick={() => setDemo((v) => !v)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-muted transition-colors hover:text-fg aria-pressed:border-accent/50 aria-pressed:bg-accent/10 aria-pressed:text-fg">
+                  {demo ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+                  {t.autoDemo}
+                </button>
+              )}
+              <Segmented label={t.stageBg} value={bg} onChange={setBg} options={(["theme", "light", "dark", "checker"] as const).map((v) => ({ value: v, label: t.stageBgs[v] }))} />
+              <Segmented label={t.speed} value={String(speed)} onChange={(v) => setSpeed(Number(v))} options={["0.5", "1", "2"].map((v) => ({ value: v, label: `${v}×` }))} />
+              <Segmented label={t.width} value={width} onChange={setWidth} options={(["phone", "tablet", "full"] as const).map((v) => ({ value: v, label: t.widths[v] }))} />
+            </div>
+          </div>
 
           <div>
             <div className="flex items-start gap-3">
@@ -96,28 +145,16 @@ export default function EffectDetail({ id, source }: { id: string; source?: stri
             </div>
             <p className="mt-4 text-lg leading-relaxed">{item.description[locale]}</p>
             <TagList item={item} className="mt-4 text-xs" />
-
-            <section className="mt-8 rounded-2xl border border-line bg-card p-5">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="font-semibold">{t.promptTitle}</h2>
-                <CopyButton text={item.aiPrompt[locale]} label={t.copyPrompt} message={t.copiedToast} />
-              </div>
-              <p className="max-h-72 overflow-auto whitespace-pre-wrap break-words text-sm leading-relaxed text-muted">{item.aiPrompt[locale]}</p>
-            </section>
+            <div className="mt-8 flex flex-wrap gap-2">
+              <QuickCopy text={item.aiPrompt[locale]} label={t.copyPrompt} message={t.copiedToast} primary />
+              {item.snippet && <QuickCopy text={() => toReact(item, locale)} label={t.copyTab(t.codeTabs.react)} message={t.tabCopied(t.codeTabs.react)} />}
+            </div>
           </div>
         </div>
 
-        <section className="mt-10 overflow-hidden rounded-2xl border border-line bg-card">
-          <div className="flex flex-wrap items-center gap-3 border-b border-line px-5 py-3">
-            <div className="mr-auto">
-              <h2 className="font-semibold">{t.sourceTitle}</h2>
-              <p className="text-xs text-muted">{item.snippet ? t.sourceSnippetNote : t.sourceNote}</p>
-            </div>
-            <span className="font-mono text-xs text-muted">{item.snippet ? "HTML + CSS" : `${item.previewComponent}.tsx`}</span>
-            <CopyButton text={code} label={t.copySource} message={t.sourceCopied} />
-          </div>
-          <pre className="max-h-[480px] overflow-auto bg-stage p-5 font-mono text-[13px] leading-relaxed"><code>{code}</code></pre>
-        </section>
+        <div className="mt-10">
+          <CodePanel item={item} source={source} />
+        </div>
 
         <nav className="mt-10 grid gap-3 sm:grid-cols-2">
           {[{ a: prev, label: t.previous, Icon: ArrowLeft }, { a: next, label: t.next, Icon: ArrowRight }].map(({ a, label, Icon }, i) => (

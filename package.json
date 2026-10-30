@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
-    "build:html": "next build && node scripts/build-standalone.mjs"
+    "build:html": "next build && node scripts/build-standalone.mjs",
+    "capture": "node scripts/capture-previews.mjs"
   },
   "dependencies": {
     "geist": "1.9.0",

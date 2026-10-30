@@ -143,9 +143,32 @@ test("previews only render while on screen", async ({ page }) => {
   await stages.first().scrollIntoViewIfNeeded();
   await expect(stages.first()).not.toHaveAttribute("data-paused");
   await expect(stages.last()).toHaveAttribute("data-paused", "");
-  await expect(stages.last().locator("> *")).toHaveCount(1); // just the replay button
+  await expect(stages.last().locator("[data-preview]")).toHaveCount(0);
 
   await stages.last().scrollIntoViewIfNeeded();
   await expect(stages.last()).not.toHaveAttribute("data-paused");
   await expect(stages.first()).toHaveAttribute("data-paused", "");
+});
+
+test("recently viewed effects show up on the home page", async ({ page }) => {
+  for (const id of ["like-burst", "bg-aurora"]) {
+    await page.goto(`/effects/${id}`);
+    await expect(page.locator("main [data-preview]").first()).toBeAttached(); // hydrated
+  }
+  await page.goto("/");
+  const recent = page.getByRole("region", { name: "最近浏览" });
+  await expect(recent.getByRole("link")).toHaveText(["极光", "点赞爆开"]);
+  await recent.getByRole("button", { name: "清除记录" }).click();
+  await expect(recent).toHaveCount(0);
+});
+
+test("interactive previews show a hint badge", async ({ page }) => {
+  await page.goto("/?c=button&t=hover");
+  await expect(page.getByText(/显示 \d+ \/ \d+ 种/)).toBeVisible();
+  const card = page.locator("main article").first();
+  // The library remounts once after hydration to apply URL filters; retry until it settles.
+  await expect(async () => {
+    await card.scrollIntoViewIfNeeded({ timeout: 1000 });
+    await expect(card).toContainText("悬停试试", { timeout: 1000 });
+  }).toPass();
 });

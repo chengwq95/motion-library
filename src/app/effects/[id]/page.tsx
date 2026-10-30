@@ -30,5 +30,5 @@ export default async function EffectPage({ params }: Props) {
   const source = item.previewComponent
     ? await readFile(path.join(process.cwd(), "src/components/previews", `${item.previewComponent}.tsx`), "utf8")
     : undefined;
-  return <EffectDetail id={item.id} source={source} />;
+  return <EffectDetail key={item.id} id={item.id} source={source} />;
 }
