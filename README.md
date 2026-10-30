@@ -109,6 +109,6 @@ btn("spotlight-sweep-btn",
 .$:hover::after, .$:focus-visible::after { left: 130%; }`),
 ```
 
-**React component.** Create the component in `src/components/previews/`, register it in `AnimationRegistry.tsx` and add its details to `animations.ts`. JavaScript animations that loop should read the `paused` prop and stop while off screen.
+**React component.** Create the component in `src/components/previews/`, register it in `src/components/AnimationRegistry.tsx` and add its details to `animations.ts`. JavaScript animations that loop should read the `paused` prop and stop while off screen.
 
 The effect page, AI prompt, code exports and share image are all generated for you. Use the theme colors (`var(--fg)`, `var(--card)`, `var(--accent)`… in CSS, or `bg-page`, `bg-card`, `text-fg`, `text-muted`, `border-line`, `bg-stage`, `bg-accent` in Tailwind) so the effect works in both light and dark mode. Run `npm run capture` afterwards to give it a share image.
