@@ -86,9 +86,6 @@ export const textMoreSnippets: SnippetDef[] = [
     `${dark}
 .$ { ${big} color: transparent; -webkit-text-stroke: 1.5px #67e8f9; animation: $-k 2s ease-in-out infinite; }
 @keyframes $-k { 0%, 100% { filter: drop-shadow(0 0 2px #22d3ee); } 50% { filter: drop-shadow(0 0 10px #22d3ee) drop-shadow(0 0 20px #0891b2); } }`, wrapDark),
-  word("stretch-y-text", ["纵向拉长", "文字被纵向拉长又压扁，像被按住再松开。"], ["Vertical Stretch", "The word stretches tall and squashes flat, like being pressed and released."], ["impact"],
-    `.$ { ${big} color: var(--fg); animation: $-k 2s cubic-bezier(.34,1.56,.64,1) infinite; }
-@keyframes $-k { 0%, 100% { transform: scaleY(1); } 30% { transform: scale(.9, 1.8); } 60% { transform: scale(1.1, .8); } }`),
   word("bounce-word", ["整体弹跳", "整个词跳起来，落地时被压扁。"], ["Word Bounce", "The whole word jumps and squashes on landing."], ["game"],
     `.$ { ${big} color: var(--fg); transform-origin: 50% 100%; animation: $-k 1.2s cubic-bezier(.5,0,.5,1) infinite; }
 @keyframes $-k { 0%, 100% { transform: translateY(0) scale(1.1, .9); } 15% { transform: scale(1); } 50% { transform: translateY(-35%) scale(.95, 1.05); } 85% { transform: scale(1); } }`),

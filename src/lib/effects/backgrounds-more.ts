@@ -108,4 +108,9 @@ ${times(3, (i) => `.$ i:nth-child(${i + 1}) { top: ${10 + i * 25}%; animation-du
 .$ i { position: absolute; border-radius: 50%; filter: blur(2px); animation: $-k ease-in-out infinite alternate; }
 @keyframes $-k { from { opacity: .15; transform: scale(.8); } to { opacity: .7; transform: scale(1.1) translateY(-10px); } }`,
     () => times(16, (i) => { const s = 14 + rnd(i, 83) * 46; return `<i style="width:${s.toFixed(0)}px;height:${s.toFixed(0)}px;left:${pct(i, 84)};top:${pct(i, 85)};background:${["#f472b6", "#a78bfa", "#fbbf24", "#60a5fa"][i % 4]};animation-duration:${(2 + rnd(i, 86) * 3).toFixed(1)}s;animation-delay:-${(rnd(i, 87) * 3).toFixed(1)}s"></i>`; }), { dark: true }),
+  bg("bg-northern-lights", ["极光", "几条绿紫色的光带在夜空中缓慢摇摆、交叠。"], ["Northern Lights", "Green and violet ribbons of light sway and overlap slowly in the night sky."], ["elegant"],
+    `.$ { background: linear-gradient(#020617, #0b1026 70%, #111827); }
+.$ i { position: absolute; left: -20%; width: 140%; height: 38%; border-radius: 50%; filter: blur(28px); mix-blend-mode: screen; opacity: .7; animation: $-k ease-in-out infinite alternate; }
+@keyframes $-k { from { transform: translateX(-8%) skewY(-6deg) scaleY(.8); } to { transform: translateX(8%) skewY(6deg) scaleY(1.2); } }`,
+    () => times(3, (i) => `<i style="top:${10 + i * 14}%;background:linear-gradient(90deg, transparent, ${["#34d399", "#22d3ee", "#a78bfa"][i]}, transparent);animation-duration:${6 + i * 2}s;animation-delay:-${i * 2}s"></i>`), { dark: true }),
 ];

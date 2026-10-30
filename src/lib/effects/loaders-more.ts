@@ -67,13 +67,6 @@ ${times(3, (i) => `.$ i:nth-of-type(${i + 1}) { left: ${12 + i * 10}px; animatio
 .$ i { position: absolute; z-index: 1; top: 0; left: 35px; width: 34px; height: 46px; box-sizing: border-box; border: 2px solid var(--fg); border-radius: 0 6px 6px 0; background: color-mix(in oklab, var(--accent) 25%, var(--card)); transform-origin: left; animation: $-k 1.8s ease-in-out infinite; }
 .$ i:nth-of-type(2) { animation-delay: .3s; } .$ i:nth-of-type(3) { animation-delay: .6s; }
 @keyframes $-k { 0%, 10% { transform: rotateY(0); } 60%, 100% { transform: rotateY(-180deg); } }`, n(3), ["elegant"]),
-  load("triple-orbit", ["三点公转", "三个圆点绕着中心以相同节奏公转。"], ["Triple Orbit", "Three dots orbit the center in perfect step."],
-    `.$ { position: relative; width: 56px; height: 56px; animation: $-spin 1.2s cubic-bezier(.6,.2,.4,.8) infinite; }
-.$ i { position: absolute; width: 12px; height: 12px; border-radius: 50%; }
-.$ i:nth-child(1) { left: 22px; top: 0; background: var(--accent); }
-.$ i:nth-child(2) { left: 3px; bottom: 6px; background: var(--accent-2); }
-.$ i:nth-child(3) { right: 3px; bottom: 6px; background: var(--accent-3); }
-${spin}`, n(3), ["game"]),
   load("zigzag-progress", ["折线进度", "一条折线从左往右被画出来，再收回。"], ["Zigzag Progress", "A zigzag line draws itself left to right, then retracts."],
     `.$ { width: 120px; }
 .$ polyline { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }

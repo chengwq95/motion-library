@@ -175,4 +175,8 @@ ${times(5, (i) => `.$:hover i:nth-of-type(${i + 1}) { animation-delay: ${i * 0.2
 .$ span + span { background: var(--fg); color: var(--page); transform: rotateX(-90deg) translateZ(24px); }
 .$:hover, .$:focus-visible { transform: translateZ(-24px) rotateX(90deg); }`,
     { html: (t) => `<div class="$-w"><button class="$" type="button"><span>${esc(t)}</span><span aria-hidden="true">${esc(t)}</span></button></div>` }),
+  btn("spotlight-sweep-btn", ["探照光扫过", "悬停时一束斜向的白光从左到右扫过按钮。"], ["Spotlight Sweep", "On hover a slanted beam of light sweeps across the button from left to right."], ["elegant"],
+    `.$ { border: 0; background: var(--accent); color: var(--accent-fg); }
+.$::after { content: ""; position: absolute; top: -50%; left: -60%; width: 40%; height: 200%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / .7), transparent); transform: skewX(-20deg); transition: left .9s ease-in-out; }
+.$:hover::after, .$:focus-visible::after { left: 130%; }`),
 ];
