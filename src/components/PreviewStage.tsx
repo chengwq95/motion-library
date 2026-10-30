@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { RotateCcw } from "lucide-react";
-import { previewRegistry } from "@/components/AnimationRegistry";
+import PreviewContent from "@/components/PreviewContent";
 import { useInView } from "@/hooks/useInView";
 import { useI18n } from "@/lib/i18n";
 import type { AnimationItem } from "@/lib/types";
@@ -13,18 +13,10 @@ export default function PreviewStage({ item, text, className = "" }: { item: Ani
   const stage = useRef<HTMLDivElement>(null);
   const inView = useInView(stage);
   const [replayKey, setReplayKey] = useState(0);
-  const Preview = item.previewComponent ? previewRegistry[item.previewComponent] : undefined;
-
-  let preview = null;
-  if (inView && Preview) preview = <Preview key={replayKey} text={text} />;
-  else if (inView && item.snippet) {
-    const html = `<style>${item.snippet.css}</style>${item.snippet.html(text, locale)}`;
-    preview = <div key={replayKey} className="relative flex h-full w-full items-center justify-center overflow-hidden" dangerouslySetInnerHTML={{ __html: html }} />;
-  }
 
   return (
     <div ref={stage} data-paused={inView ? undefined : ""} className={`group/stage relative bg-stage [container-type:inline-size] ${className}`}>
-      {preview}
+      {inView && <PreviewContent key={replayKey} item={item} text={text} locale={locale} />}
       <button
         type="button"
         onClick={() => setReplayKey((k) => k + 1)}

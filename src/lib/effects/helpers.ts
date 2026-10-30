@@ -58,29 +58,20 @@ export function charCss(keyframes: string, o: { dur?: string; ease?: string; by?
 }
 export const charHtml = (text: string) => `<div class="$">${chars(text)}</div>`;
 
-const SAMPLES: Partial<Record<ComponentKind, Localized[]>> = {
-  text: [
-    { zh: "动效", en: "MOTION" }, { zh: "灵感", en: "SPARK" }, { zh: "你好", en: "HELLO" },
-    { zh: "心动", en: "VIBES" }, { zh: "闪耀", en: "SHINE" }, { zh: "未来", en: "FUTURE" },
-  ],
-  button: [
-    { zh: "立即开始", en: "Get started" }, { zh: "了解更多", en: "Learn more" }, { zh: "提交", en: "Submit" },
-    { zh: "下载", en: "Download" }, { zh: "订阅", en: "Subscribe" }, { zh: "加入我们", en: "Join us" },
-  ],
-  nav: [{ zh: "首页", en: "Home" }],
-  control: [{ zh: "邮箱", en: "Email" }],
-  loader: [{ zh: "加载中", en: "Loading" }],
-  background: [{ zh: "你好，世界", en: "Hello, world" }, { zh: "新的开始", en: "Fresh start" }, { zh: "灵感无限", en: "Dream big" }],
-  card: [{ zh: "动效卡片", en: "Motion card" }, { zh: "精选作品", en: "Featured" }],
-  icon: [{ zh: "图标", en: "Icon" }],
-  data: [{ zh: "完成度", en: "Progress" }],
+// One fixed sample per kind keeps the library calm and comparable; text-like effects all say "动效 / Motion".
+const MOTION: Localized = { zh: "动效", en: "Motion" };
+const SAMPLES: Record<ComponentKind, Localized> = {
+  text: MOTION,
+  card: MOTION,
+  background: MOTION,
+  cursor: MOTION,
+  icon: MOTION,
+  button: { zh: "开始使用", en: "Get started" },
+  nav: { zh: "首页", en: "Home" },
+  control: { zh: "邮箱", en: "Email" },
+  loader: { zh: "加载中", en: "Loading" },
+  data: { zh: "完成度", en: "Progress" },
 };
-
-function hash(s: string) {
-  let h = 0;
-  for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) | 0;
-  return Math.abs(h);
-}
 
 function prompt(def: SnippetDef, css: string, html: (t: string, l: Locale) => string, sample: Localized): Localized {
   const code = (l: Locale) => `HTML:\n${html(sample[l], l)}\n\nCSS:\n${css}`;
@@ -94,8 +85,7 @@ export function fromSnippet(def: SnippetDef): AnimationItem {
   const scope = `fx-${def.id}`;
   const css = def.css.replaceAll("$", scope).trim();
   const html = (t: string, l: Locale) => def.html(t, l).replaceAll("$", scope);
-  const pool = SAMPLES[def.c] ?? [{ zh: "动效", en: "Motion" }];
-  const sample = def.sample ?? pool[hash(def.id) % pool.length];
+  const sample = def.sample ?? SAMPLES[def.c];
   return {
     id: def.id,
     name: { zh: def.zh[0], en: def.en[0] },

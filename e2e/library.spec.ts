@@ -15,7 +15,7 @@ test("lists every effect in Chinese without errors", async ({ page }) => {
 
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("收集好看的网页动效");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("好看的网页动效");
   await expect(cards(page)).toHaveCount(GROUPED_VISIBLE);
   await expect(status(page)).toHaveText(`显示 ${TOTAL} / ${TOTAL} 种`);
   expect(errors).toEqual([]);
@@ -86,10 +86,10 @@ test("language choice switches the UI and persists", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "EN" }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("A library of web motion");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Beautiful web motion");
 
   await page.reload();
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("A library of web motion");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Beautiful web motion");
   await expect(status(page)).toHaveText(`Showing ${TOTAL} of ${TOTAL}`);
 });
 
@@ -140,6 +140,7 @@ test("favorites can be filtered and survive a reload", async ({ page }) => {
 test("previews only render while on screen", async ({ page }) => {
   await page.goto("/");
   const stages = page.locator("main article > div:first-child");
+  await stages.first().scrollIntoViewIfNeeded();
   await expect(stages.first()).not.toHaveAttribute("data-paused");
   await expect(stages.last()).toHaveAttribute("data-paused", "");
   await expect(stages.last().locator("> *")).toHaveCount(1); // just the replay button

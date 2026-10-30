@@ -133,7 +133,9 @@ export const textSnippets: SnippetDef[] = [
 @keyframes $-k { to { background-position: 300% 0; } }`),
   word("neon-sign", ["霓虹灯牌", "粉色霓虹灯，偶尔闪烁一下。"], ["Neon Sign", "A pink neon sign that flickers now and then."], ["tech"],
     `.$ { ${big} color: #fff0f6; text-shadow: 0 0 4px #fff, 0 0 10px #f472b6, 0 0 22px #ec4899, 0 0 44px #db2777; animation: $-k 3s infinite; }
-@keyframes $-k { 0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; } 20%, 24%, 55% { opacity: .35; text-shadow: none; } }`),
+.$-w { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(circle at 50% 40%, #1f0a1a, #09060b 70%); }
+@keyframes $-k { 0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; } 20%, 24%, 55% { opacity: .35; text-shadow: none; } }`,
+    (t) => `<div class="$-w"><div class="$">${esc(t)}</div></div>`),
   word("glitch-text", ["故障文字", "红青两色错位切片，像信号故障。"], ["Glitch", "Red and cyan slices jump out of place like a bad signal."], ["tech"],
     `.$ { ${big} position: relative; color: var(--fg); }
 .$::before, .$::after { content: attr(data-t); position: absolute; inset: 0; }

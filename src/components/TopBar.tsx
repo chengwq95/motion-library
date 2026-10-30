@@ -30,10 +30,13 @@ export default function TopBar() {
   const themeLabel = t.themeLabel(t.themes[themePref]);
 
   return (
-    <div className="sticky top-0 z-40 border-b border-line/70 bg-page/80 backdrop-blur-md">
-      <nav className="max-w-[1200px] mx-auto px-4 sm:px-6 h-14 flex items-center gap-2 sm:gap-3">
-        <Link href="/" className="mr-auto flex items-center gap-2.5 font-bold tracking-tight">
-          <Logo className="w-7 h-7 rounded-lg ring-1 ring-line" />
+    <div className="sticky top-0 z-40 border-b border-line/60 bg-page/70 backdrop-blur-xl backdrop-saturate-150">
+      <nav className="max-w-[1200px] mx-auto px-4 sm:px-6 h-16 flex items-center gap-2 sm:gap-3">
+        <Link href="/" className="mr-auto flex items-center gap-2.5 font-semibold tracking-tight">
+          <span className="relative">
+            <span aria-hidden className="absolute -inset-1.5 rounded-xl bg-accent/30 blur-md" />
+            <Logo className="relative w-7 h-7 rounded-lg ring-1 ring-white/10" />
+          </span>
           <span>{t.brand}</span>
         </Link>
 
