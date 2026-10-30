@@ -1,9 +1,16 @@
 import type { Metadata, Viewport } from "next";
+import AppToaster from "@/components/AppToaster";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
+const description = "搜索、筛选和试玩网页动效，一键复制 AI 提示词。Browse, filter and play with web animations, and copy AI prompts.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Motion Library 动效收藏",
-  description: "搜索、筛选和试玩网页动效，一键复制 AI 提示词。Browse, filter and play with web animations, and copy AI prompts.",
+  description,
+  openGraph: { siteName: "Motion Library", type: "website", locale: "zh_CN", alternateLocale: ["en_US"], description },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
@@ -22,7 +29,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script dangerouslySetInnerHTML={{ __html: initPrefs }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <AppToaster />
+      </body>
     </html>
   );
 }

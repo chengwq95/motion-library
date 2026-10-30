@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { Monitor, Moon, Plus, Sun } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { setLocale, setThemePref, useThemePref, type ThemePref } from "@/lib/prefs";
 import type { Locale } from "@/lib/types";
+import SubmitDialog from "@/components/SubmitDialog";
 
 const NEXT_THEME: Record<ThemePref, ThemePref> = { system: "light", light: "dark", dark: "system" };
 const THEME_ICON = { system: Monitor, light: Sun, dark: Moon };
@@ -19,7 +22,8 @@ export function Logo({ className }: { className?: string }) {
   );
 }
 
-export default function TopBar({ onSubmit }: { onSubmit: () => void }) {
+export default function TopBar() {
+  const [submitOpen, setSubmitOpen] = useState(false);
   const { t, locale } = useI18n();
   const themePref = useThemePref();
   const ThemeIcon = THEME_ICON[themePref];
@@ -28,11 +32,11 @@ export default function TopBar({ onSubmit }: { onSubmit: () => void }) {
   return (
     <div className="sticky top-0 z-40 border-b border-line/70 bg-page/80 backdrop-blur-md">
       <nav className="max-w-[1200px] mx-auto px-4 sm:px-6 h-14 flex items-center gap-2 sm:gap-3">
-        <a href="#top" className="mr-auto flex items-center gap-2.5 font-bold tracking-tight">
+        <Link href="/" className="mr-auto flex items-center gap-2.5 font-bold tracking-tight">
           <Logo className="w-7 h-7 rounded-lg ring-1 ring-line" />
           <span>Motion Library</span>
           <span className="hidden sm:inline text-muted font-normal">{locale === "zh" ? "动效收藏" : ""}</span>
-        </a>
+        </Link>
 
         <div role="group" aria-label={t.language} className="flex rounded-full border border-line bg-card p-0.5 text-xs font-medium">
           {LOCALES.map((l) => (
@@ -61,13 +65,14 @@ export default function TopBar({ onSubmit }: { onSubmit: () => void }) {
 
         <button
           type="button"
-          onClick={onSubmit}
+          onClick={() => setSubmitOpen(true)}
           className="flex items-center gap-1 rounded-full bg-fg px-3.5 h-8 text-sm font-medium text-page transition-transform hover:scale-[1.03] active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           <Plus className="w-4 h-4" />
           {t.submit}
         </button>
       </nav>
+      <SubmitDialog open={submitOpen} onClose={() => setSubmitOpen(false)} />
     </div>
   );
 }

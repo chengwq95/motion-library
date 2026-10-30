@@ -1,0 +1,15 @@
+import { animations } from "@/lib/animations";
+import { OG_SIZE, renderOgImage } from "@/lib/og";
+
+export const alt = "Motion Library: playable web animations with AI prompts";
+export const size = OG_SIZE;
+export const contentType = "image/png";
+
+export default function Image() {
+  return renderOgImage({
+    eyebrow: "Motion Library · 动效收藏",
+    title: "Motion Library",
+    subtitle: `${animations.length} playable web animations, each with a copy-ready AI prompt.`,
+    chips: animations.slice(0, 6).map((a) => a.name.en),
+  });
+}
