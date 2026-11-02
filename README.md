@@ -2,7 +2,7 @@
 
 [Open the live site →](https://chengwq95.github.io/motion-library/)
 
-A collection of 500 web animation effects you can search, filter and try out in the browser. Every effect comes with an AI prompt you can paste into your coding assistant. HTML + CSS effects also include ready-to-run React and Vue versions.
+A collection of 510 web animation effects you can search, filter and try out in the browser. Every effect comes with an AI prompt you can paste into your coding assistant. HTML + CSS effects also include ready-to-run React and Vue versions.
 
 Built with Next.js, React, TypeScript and Tailwind CSS. The interface is available in Simplified Chinese and English, with light and dark themes.
 
@@ -77,23 +77,23 @@ HTML + CSS effects include all code formats. React-based effects provide an AI p
 
 | Category | Effects |
 | --- | ---: |
-| Text | 122 |
-| Buttons | 72 |
+| Text | 126 |
+| Buttons | 74 |
 | Cards | 52 |
 | Navigation | 40 |
 | Form controls | 44 |
-| Loaders | 64 |
-| Backgrounds | 50 |
+| Loaders | 66 |
+| Backgrounds | 52 |
 | Icons | 34 |
 | Data | 20 |
 | Cursors | 2 |
-| **Total** | **500** |
+| **Total** | **510** |
 
 ## Features
 
 **Browsing**
 
-- 500 effects in ten categories: text, buttons, cards, navigation, form controls, loaders, backgrounds, icons, data and cursors.
+- 510 effects in ten categories: text, buttons, cards, navigation, form controls, loaders, backgrounds, icons, data and cursors, including a **Chinese style** series (brush writing, seal stamps, scrolls, ink wash, lanterns, plum petals) you can filter by.
 - Search in either language, and filter by component, trigger (auto, hover, click, focus, enter, scroll, drag), context and technique. Each filter shows how many results it would give.
 - Filters are kept in the URL, so a link like `/?c=button&t=hover` opens the same results for anyone.
 - Star effects to save them as favorites, and show only your favorites with one click.
