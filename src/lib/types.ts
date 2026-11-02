@@ -3,7 +3,7 @@ export type Localized = Record<Locale, string>;
 
 export const COMPONENTS = ["text", "button", "card", "nav", "control", "loader", "background", "icon", "data", "cursor"] as const;
 export const TRIGGERS = ["auto", "hover", "click", "focus", "enter", "scroll", "drag"] as const;
-export const CONTEXTS = ["impact", "tech", "game", "interactive", "showcase", "elegant", "feedback"] as const;
+export const CONTEXTS = ["impact", "tech", "game", "interactive", "showcase", "elegant", "feedback", "chinese"] as const;
 export const TECHS = ["CSS", "SVG", "GSAP", "React"] as const;
 
 export type ComponentKind = (typeof COMPONENTS)[number];

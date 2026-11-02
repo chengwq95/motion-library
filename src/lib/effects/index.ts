@@ -3,6 +3,7 @@ import { backgroundMoreSnippets } from "./backgrounds-more";
 import { buttonSnippets } from "./buttons";
 import { buttonMoreSnippets } from "./buttons-more";
 import { cardSnippets } from "./cards";
+import { chineseSnippets } from "./chinese";
 import { cardMoreSnippets } from "./cards-more";
 import { controlSnippets } from "./controls";
 import { controlMoreSnippets } from "./controls-more";
@@ -28,4 +29,5 @@ export const snippetEffects = [
   ...backgroundSnippets, ...backgroundMoreSnippets,
   ...iconSnippets, ...iconMoreSnippets,
   ...dataSnippets, ...dataMoreSnippets,
+  ...chineseSnippets,
 ].map(fromSnippet);
