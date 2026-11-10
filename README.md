@@ -123,3 +123,7 @@ HTML + CSS effects include all code formats. React-based effects provide an AI p
 | `Esc` | Clear search |
 | `R` | Open a random effect |
 | `←` / `→` | Open the previous / next effect on a detail page |
+
+## License
+
+[MIT](LICENSE)
